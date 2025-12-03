@@ -1,0 +1,5 @@
+#define SECRET_SSID "SFR_E8CF"
+#define SECRET_PASSWORD "WifiAppart"
+#define ADRESSE_IP_BROKER "192.168.1.63"
+#define USER_MQTT "mqtt_adm"
+#define PASSWORD_MQTT "mqtt_adm"
