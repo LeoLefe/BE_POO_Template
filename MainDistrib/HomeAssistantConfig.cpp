@@ -8,13 +8,13 @@
   //Constructeurs
   HomeAssistantConfig :: HomeAssistantConfig()
   {
-    setup_wifi();
-    setup_time();
+    //setup_wifi();
+    //setup_time();
   }
 
   HomeAssistantConfig :: ~HomeAssistantConfig()
   {
-    
+
   }
 
   //Méthodes

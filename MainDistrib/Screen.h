@@ -12,27 +12,27 @@
 #include <SPI.h>
 
 
-  class Screen
-  {
-    // Attributs
-    protected :
-    TFT_eSPI tft; //extern
+class Screen
+{
+  // Attributs
+  protected :
+  TFT_eSPI tft; //extern
 
-    int centerX = tft.width() / 2;
-    int centerY = tft.height() / 2;
+  int centerX;
+  int centerY;
 
-    //Constructeurs
-    public :
-    Screen();
+  //Constructeurs
+  public :
+  Screen();
 
-    //Déconstructeurs
-    ~Screen();
+  //Déconstructeurs
+  ~Screen();
 
-    //Méthodes
-    void Init();
-    void Test();
-    void Show_time(HomeAssistantConfig HAC);
-  };  
+  //Méthodes
+  void Init();
+  void Test();
+  void Show_time(HomeAssistantConfig HAC);
+};  
 
 
 #endif //ends #ifndef SCREEN

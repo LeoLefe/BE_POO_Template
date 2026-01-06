@@ -9,16 +9,11 @@
   //Constructeurs
   Screen :: Screen()
   {
-    Init();
+    //Init();
   }
 
   //Déconstructeurs
-  Screen :: ~Screen()
-  {
-    delete[] &tft;
-    delete[] &centerX;
-    delete[] &centerY;
-  }
+  Screen :: ~Screen(){}
 
   //Méthodes
   void Screen::Init()
@@ -29,6 +24,8 @@
     tft.fillScreen(TFT_BLACK); // Affiche du texte au milieu
     tft.setTextColor(TFT_BLACK, TFT_WHITE);
     tft.setTextDatum(MC_DATUM); // Centre le texte
+    centerX = tft.width() / 2;
+    centerY = tft.height() / 2;
     tft.drawString("Ecran OK !", centerX, centerY);
     Serial.println("Ecran prêt !");
   }

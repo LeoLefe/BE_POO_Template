@@ -19,9 +19,14 @@ void setup() {
   Serial.begin(115200);  //Moniteur série
   Serial.println(ESP.getSdkVersion());
   
+  _screen.Init();
+  _sensor.InitDistance();
+  _homeassistantconfig.setup_wifi();
+  _homeassistantconfig.setup_time();
   //Init terminée
-  Serial.println("Modules initialisés !");
+  //Serial.println("Modules initialisés !");
 }
+
 
 void loop() 
 {

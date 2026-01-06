@@ -4,11 +4,7 @@
   //Constructeurs
   DistributionManager :: DistributionManager(){}
 
-  DistributionManager :: ~DistributionManager()
-  {
-    delete[] &heure_matin;
-    delete[] &heure_soir;
-  }
+  DistributionManager :: ~DistributionManager(){}
 
   //Méthodes
   void DistributionManager :: set_heure_distribution_matin(const String& heure) {

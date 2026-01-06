@@ -9,14 +9,11 @@
   //Constructeurs
   Sensor :: Sensor()
   {
-    InitDistance();
+    //InitDistance();
   }
 
   //Déconstructeurs
-  Sensor :: ~Sensor()
-  {
-    delete[] &sensor;
-  }
+  Sensor :: ~Sensor(){}
 
   //Méthodes
   void Sensor :: InitDistance()
@@ -28,11 +25,14 @@
     if (!sensor.init())
     {
       Serial.println("Erreur : Capteur VL53L0X non détecté !");
-      while (1); // Stoppe tout si capteur absent
+      //while (1); // Stoppe tout si capteur absent
+    }
+    else 
+    {
+      sensor.setTimeout(500);
+      Serial.println("Capteur VL53L0X prêt !");
     }
     
-    sensor.setTimeout(500);
-    Serial.println("Capteur VL53L0X prêt !");
   }
 
   uint16_t Sensor :: ReadDistance_mm()

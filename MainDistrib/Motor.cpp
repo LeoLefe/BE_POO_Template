@@ -13,11 +13,7 @@
   }
 
   //Déconstructeurs
-  Motor :: ~Motor()
-  {
-    delete[] &nb_tours;
-    delete[] &vitesse;
-  }
+  Motor :: ~Motor(){}
 
   //Méthodes
   void Motor :: Init()
