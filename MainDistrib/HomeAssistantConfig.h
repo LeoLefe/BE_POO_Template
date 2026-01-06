@@ -1,17 +1,40 @@
+/*********************************************************************
+ * @file  HomeAssistantConfig.h
+ * @author <Léo Lefebvre & Estelle Coudon>
+ * @brief Fichier de déclaration de la classe Connexion
+ *********************************************************************/
 #ifndef HOMEASSISTANTCONFIG_H
 #define HOMEASSISTANTCONFIG_H
 
 #include <Arduino.h>
+#include <WiFi.h>
+#include <time.h>
+#include <PubSubClient.h>
+#include "Motor.h"
+#include "Secret.h"
 
-void setup_wifi();
 
-void reconnect_mqtt();
-void mqtt_loop();
-void publish_niveau(uint8_t niveau);
-void set_mqtt_callback(void (*callback)(char* topic, byte* payload, unsigned int length));
-void mqtt_callback(char* topic, byte* payload, unsigned int length);
+  class HomeAssistantConfig
+  {
+    //Constantes
+    // Informations WiFi
+    const char* ssid = SECRET_SSID;
+    const char* password = SECRET_PASSWORD;
 
-void setup_time();
-String get_time_string();
+    public:
+    //Constructeurs
+    HomeAssistantConfig();
+
+    ~HomeAssistantConfig();
+
+    //Méthodes
+    //Gestion Wifi
+    void setup_wifi();
+
+    // Gestion de l'heure
+    void setup_time();
+    String get_time_string();
+  };
+
 
 #endif // HOMEASSISTANTCONFIG_H

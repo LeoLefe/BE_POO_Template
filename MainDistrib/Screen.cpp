@@ -1,44 +1,60 @@
+/*********************************************************************
+ * @file  Screen.cpp
+ * @author <Léo Lefebvre & Estelle Coudon>
+ * @brief Fichier de déclaration de la classe Screen
+ *********************************************************************/
 #include "Screen.h"
-#include "HomeAssistantConfig.h"
-#include <time.h>
-#include <TFT_eSPI.h> // Librairie TFT_eSPI
-#include <SPI.h>
-extern TFT_eSPI tft;
 
-int centerX = tft.width() / 2;
-int centerY = tft.height() / 2;
 
-void screen_init(){
-  //Init SPI
-  tft.init();
-  tft.setRotation(2);
-  tft.fillScreen(TFT_BLACK); // Affiche du texte au milieu
-  tft.setTextColor(TFT_BLACK, TFT_WHITE);
-  tft.setTextDatum(MC_DATUM); // Centre le texte
-  tft.drawString("Ecran OK !", centerX, centerY);
-  Serial.println("Ecran prêt !");
-}
+  //Constructeurs
+  Screen :: Screen()
+  {
+    Init();
+  }
 
-void screen_test(){
-  // Efface l'écran avec une couleur aléatoire
-  uint16_t randomColor = tft.color565(random(0, 256), random(0, 256), random(0, 256));
-  tft.fillScreen(randomColor);
+  //Déconstructeurs
+  Screen :: ~Screen()
+  {
+    delete[] &tft;
+    delete[] &centerX;
+    delete[] &centerY;
+  }
 
-  // Dessine un cercle blanc au centre
-  tft.fillCircle(centerX, centerY, 60, TFT_WHITE);
+  //Méthodes
+  void Screen::Init()
+  {
+    //Init SPI
+    tft.init();
+    tft.setRotation(2);
+    tft.fillScreen(TFT_BLACK); // Affiche du texte au milieu
+    tft.setTextColor(TFT_BLACK, TFT_WHITE);
+    tft.setTextDatum(MC_DATUM); // Centre le texte
+    tft.drawString("Ecran OK !", centerX, centerY);
+    Serial.println("Ecran prêt !");
+  }
 
-  // Affiche du texte au milieu
-  tft.setTextColor(TFT_BLACK, TFT_WHITE);
-  tft.setTextDatum(MC_DATUM); // Centre le texte
-  tft.drawString("Ecran OK !", centerX, centerY);
-}
+  void Screen::Test()
+  {
+    // Efface l'écran avec une couleur aléatoire
+    uint16_t randomColor = tft.color565(random(0, 256), random(0, 256), random(0, 256));
+    tft.fillScreen(randomColor);
 
-void screen_show_time() {
-  String heure = get_time_string();
+    // Dessine un cercle blanc au centre
+    tft.fillCircle(centerX, centerY, 60, TFT_WHITE);
 
-  //tft.fillScreen(TFT_BLACK); // Nettoyer l'écran
-  tft.setTextColor(TFT_WHITE, TFT_BLACK);
-  tft.setTextSize(4);
-  tft.setTextDatum(MC_DATUM); // MC_DATUM : Milieu Centre
-  tft.drawString(heure, tft.width() / 2, tft.height() / 2); // Affiche l'heure au centre
-}
+    // Affiche du texte au milieu
+    tft.setTextColor(TFT_BLACK, TFT_WHITE);
+    tft.setTextDatum(MC_DATUM); // Centre le texte
+    tft.drawString("Ecran OK !", centerX, centerY);
+  }
+
+  void Screen::Show_time(HomeAssistantConfig HAC)
+  {
+    String heure = HAC.get_time_string();
+
+    //tft.fillScreen(TFT_BLACK); // Nettoyer l'écran
+    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.setTextSize(4);
+    tft.setTextDatum(MC_DATUM); // MC_DATUM : Milieu Centre
+    tft.drawString(heure, tft.width() / 2, tft.height() / 2); // Affiche l'heure au centre
+  }

@@ -1,5 +1,7 @@
-#define SECRET_SSID "SFR_E8CF"
-#define SECRET_PASSWORD "WifiAppart"
-#define ADRESSE_IP_BROKER "192.168.1.63"
-#define USER_MQTT "mqtt_adm"
-#define PASSWORD_MQTT "mqtt_adm"
+/*********************************************************************
+ * @file  Secret.h
+ * @author <Léo Lefebvre & Estelle Coudon>
+ * @brief Fichier de déclaration des informations de connexion
+ *********************************************************************/
+#define SECRET_SSID "Tel-Leo"
+#define SECRET_PASSWORD "12345678"
