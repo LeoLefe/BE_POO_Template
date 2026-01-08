@@ -1,12 +1,12 @@
 /*********************************************************************
- * @file  Secret.h
+ * @file  Animals.h
  * @author <Léo Lefebvre & Estelle Coudon>
- * @brief Fichier de déclaration des informations de connexion
  *********************************************************************/
-#ifndef SECRET_H
-#define SECRET_H
+#ifndef ANIMALS_H
+#define ANIMALS_H
 
-#define SECRET_SSID "Tel-Leo"
-#define SECRET_PASSWORD "12345678"
+class Animals {
+  private:
+    
 
-#endif
+}

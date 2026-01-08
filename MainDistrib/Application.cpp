@@ -5,28 +5,41 @@
  *********************************************************************/
 #include "Application.h"
 
+Application::Application() : lastUpdateUI(0) {}
+Application::~Application() {}
 
-Application::Application()
-{
-	// Code ttttt
-  ; 
-}
+void Application::Init() {
+  Serial.println("Init Application...");
   
-Application::~Application()
-{
-  // Code
-  ;
-}  
-
-void Application::init(void)
-{
-  // Code
-    ;
+  motor.Init();
+  inputs.Init();
+  screen.Init();
+  network.Init(); 
+  sensor.Init();
+  distributor.Init();
+  
+  Serial.println("Application Prête !");
+  screen.Refresh();
 }
 
+void Application::Run() {
+  // 1. Gestion Réseau
+  network.Update();
+  String currentTime = network.GetTimeString();
 
-void Application::run(void)
-{
-  // Code
-    ;
+  // 2. Gestion Inputs (Bouton Manuel)
+  if (inputs.IsManualFeedRequested()) {
+    screen.ShowMessage("Distribution...");
+    distributor.ForceFeed(&motor);
+  }
+
+  // 3. Gestion Automatique (Horaires)
+  distributor.CheckAutoFeed(currentTime, &motor);
+
+  // 4. Mise à jour Interface
+  if (millis() - lastUpdateUI > 500) {
+    uint8_t level = sensor.GetLevelPercent();
+    screen.UpdateDashboard(currentTime, level);
+    lastUpdateUI = millis();
+  }
 }

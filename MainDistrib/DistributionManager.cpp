@@ -1,49 +1,32 @@
 #include "DistributionManager.h"
 
+DistributionManager::DistributionManager() {
+  heureMatin = "08:00:00";
+  heureSoir = "19:00:00";
+  distributionFaiteCetteMinute = false;
+}
 
-  //Constructeurs
-  DistributionManager :: DistributionManager(){}
+DistributionManager::~DistributionManager() {}
 
-  DistributionManager :: ~DistributionManager(){}
+void DistributionManager::Init() {}
 
-  //Méthodes
-  void DistributionManager :: set_heure_distribution_matin(const String& heure) {
-    heure_matin = heure;
+void DistributionManager::CheckAutoFeed(String currentTime, Motor* motor) {
+  // Logique simple pour déclencher à la seconde 00
+  bool isTime = (currentTime == heureMatin || currentTime == heureSoir);
+  
+  if (isTime && !distributionFaiteCetteMinute) {
+    Serial.println("Distribution Automatique !");
+    motor->Rotate(1.0); // 1 tour
+    distributionFaiteCetteMinute = true; 
   }
 
-  void DistributionManager :: set_heure_distribution_soir(const String& heure) {
-    heure_soir = heure;
+  // Reset du flag quand l'heure change
+  if (!isTime) {
+    distributionFaiteCetteMinute = false;
   }
+}
 
-  void DistributionManager :: Check_heure(Motor motor, Sensor sensor, HomeAssistantConfig HAC) {
-    String heure = HAC.get_time_string();
-
-    // Distribution du matin
-    if (heure == heure_matin) {
-      Serial.println("Distribution automatique du matin !");
-      motor.Start_async(1, 800);
-    }
-
-    // Distribution du soir
-    if (heure == heure_soir) {
-      Serial.println("Distribution automatique du soir !");
-      motor.Start_async(1, 800);
-    }
-
-    // Mesure du niveau de croquette
-    uint16_t distance = sensor.GetNiveauPercent();
-    Serial.print("Niveau croquette : ");
-    Serial.print(distance);
-    Serial.println(" %");
-
-  }
-
-  void DistributionManager :: Manuelle(int portions_manuelles, Sensor sensor){
-    Serial.println(portions_manuelles);
-
-    // Mesure du niveau de croquette
-    uint16_t distance = sensor.GetNiveauPercent();
-    Serial.print("Niveau croquette : ");
-    Serial.print(distance);
-    Serial.println(" %");
-  }
+void DistributionManager::ForceFeed(Motor* motor) {
+  Serial.println("Distribution Manuelle !");
+  motor->Rotate(0.5); 
+}

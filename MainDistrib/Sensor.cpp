@@ -5,55 +5,40 @@
  *********************************************************************/
 #include "Sensor.h"
 
+Sensor::Sensor() : isReady(false) {}
+Sensor::~Sensor() {}
 
-  //Constructeurs
-  Sensor :: Sensor()
-  {
-    //InitDistance();
+void Sensor::Init() {
+  Wire.begin(27, 14); // SDA, SCL
+  delay(100);
+
+  sensor.setTimeout(500);
+  if (!sensor.init()) {
+    Serial.println("ERREUR: Capteur VL53L0X non détecté !");
+    isReady = false;
+  } else {
+    sensor.startContinuous();
+    isReady = true;
+    Serial.println("Capteur VL53L0X prêt.");
   }
+}
 
-  //Déconstructeurs
-  Sensor :: ~Sensor(){}
+uint16_t Sensor::ReadDistanceMM() {
+  if (!isReady) return 9999; // Valeur d'erreur
+  return sensor.readRangeContinuousMillimeters();
+}
 
-  //Méthodes
-  void Sensor :: InitDistance()
-  {
-    // Initialisation du bus I2C personnalisé
-    Wire.begin(27, 14); // SDA sur GPIO27, SCL sur GPIO14 (comme ton schéma)
-    delay(100);
+uint8_t Sensor::GetLevelPercent() {
+  if (!isReady) return 0;
 
-    if (!sensor.init())
-    {
-      Serial.println("Erreur : Capteur VL53L0X non détecté !");
-      //while (1); // Stoppe tout si capteur absent
-    }
-    else 
-    {
-      sensor.setTimeout(500);
-      Serial.println("Capteur VL53L0X prêt !");
-    }
-    
-  }
+  uint16_t dist = ReadDistanceMM();
+  
+  // Bornage des valeurs
+  if (dist > 8000) return 0; // Erreur de lecture (out of range)
+  if (dist >= DIST_EMPTY) return 0;
+  if (dist <= DIST_FULL) return 100;
 
-  uint16_t Sensor :: ReadDistance_mm()
-  {
-    return sensor.readRangeSingleMillimeters();
-  }
-
-  // Retourne le niveau en pourcentage (0 à 100%)
-  uint8_t Sensor :: GetNiveauPercent()
-  {
-    uint16_t distance = ReadDistance_mm();
-
-    if (distance <= DIST_MIN_FULL) {
-      return 100;
-    }
-    if (distance >= DIST_MAX_EMPTY) {
-      return 0;
-    }
-    
-    // Interpolation linéaire entre plein et vide
-    float niveau = 100.0 * (DIST_MAX_EMPTY - distance) / (DIST_MAX_EMPTY - DIST_MIN_FULL);
-    return (uint8_t)niveau;
-  }
-
+  // Produit en croix inversé (plus la distance est grande, moins il y a de croquettes)
+  long level = map(dist, DIST_EMPTY, DIST_FULL, 0, 100);
+  return (uint8_t)level;
+}

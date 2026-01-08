@@ -5,55 +5,38 @@
  *********************************************************************/
 #include "Motor.h"
 
+Motor::Motor() {}
+Motor::~Motor() {}
 
-  //Constructeurs
-  Motor :: Motor()
-  {
-    Init();
+void Motor::Init() {
+  pinMode(PIN_STEP, OUTPUT);
+  pinMode(PIN_DIR, OUTPUT);
+  pinMode(PIN_EN, OUTPUT);
+  Disable(); // Désactivé au démarrage pour ne pas chauffer
+}
+
+void Motor::Enable() {
+  digitalWrite(PIN_EN, LOW); // LOW = Activé sur A4988
+}
+
+void Motor::Disable() {
+  digitalWrite(PIN_EN, HIGH); // HIGH = Désactivé
+}
+
+void Motor::Rotate(float turns) {
+  Enable();
+  long stepsToMake = (long)(turns * TOTAL_STEPS);
+  
+  // Direction (par défaut horaire)
+  digitalWrite(PIN_DIR, HIGH); 
+
+  // Boucle de mouvement
+  for(long i = 0; i < stepsToMake; i++) {
+    digitalWrite(PIN_STEP, HIGH);
+    delayMicroseconds(500); // Ajuster vitesse ici (plus petit = plus vite)
+    digitalWrite(PIN_STEP, LOW);
+    delayMicroseconds(500);
   }
-
-  //Déconstructeurs
-  Motor :: ~Motor(){}
-
-  //Méthodes
-  void Motor :: Init()
-  {
-    //Init Driver moteur
-    pinMode(PIN_STEP, OUTPUT);
-    pinMode(PIN_DIR, OUTPUT);
-    pinMode(PIN_EN, OUTPUT);
-    digitalWrite(PIN_EN, HIGH); // Désactivation du moteur
-    Serial.println("Moteur prêt !");
-  }
-
-  void Motor :: Start(float nb_tour, int vitesse)
-  {
-    // Faire avancer le moteur de nb_tour complet
-    digitalWrite(PIN_EN, LOW); // LOW = moteur activé
-    for (int i = 0; i < (microsteps_per_revolution*nb_tour); i++){
-      digitalWrite(PIN_STEP, HIGH);
-      delayMicroseconds(vitesse); // Ajuste pour la vitesse (plus petit = plus rapide)
-      digitalWrite(PIN_STEP, LOW);
-      delayMicroseconds(vitesse);
-    }
-    delay(500);
-    digitalWrite(PIN_EN, HIGH); // HIGH = moteur désactivé
-  }
-
-  void Motor :: Inversion()
-  {
-    // Inverser la direction du moteur
-    digitalWrite(PIN_DIR, !digitalRead(PIN_DIR));
-
-  }
-
-  void Motor :: Task()
-  {
-    Start(nb_tours, vitesse);
-    vTaskDelete(NULL); // termine la tâche
-  }
-
-  void Motor :: Start_async(float nb_tours, int vitesse)
-  {
-    
-  }
+  
+  Disable(); // On relâche pour économiser l'énergie
+}

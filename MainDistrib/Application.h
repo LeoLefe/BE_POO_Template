@@ -3,35 +3,32 @@
  * @author <mettre l'adresse mail ou nom prenom>
  * @brief Fichier header de l'application
  *********************************************************************/
-#ifndef APPLICATION_H_
-#define APPLICATION_H_
+#ifndef APPLICATION_H
+#define APPLICATION_H
 
-/**
-  * @class Application
-  * @brief Classe Application 
-*/    
-class Application
-{
-  public :
-    /**
-     * @fn Application();
-     * @brief Constructeur par defaut
-    */    
+#include "Motor.h"
+#include "Sensor.h"
+#include "Screen.h"
+#include "NetworkApp.h"
+#include "DistributionManager.h"
+#include "InputManager.h"
+
+class Application {
+  private:
+    Motor motor;
+    Sensor sensor;
+    Screen screen;
+    NetworkApp network; 
+    DistributionManager distributor;
+    InputManager inputs;
+
+    unsigned long lastUpdateUI;
+
+  public:
     Application();
-    /**
-     * @fn Application();
-     * @brief Destructeur
-    */    
-    ~Application();    
-    /**
-     * @fn void init(void)
-     * @brief Fonction d'initialisation de l'application
-    */
-    void init(void);
-    /**
-     * @fn void run(void)
-     * @brief Fonction de lancement de l'application
-    */
-    void run(void);
+    ~Application();
+    void Init();
+    void Run();
 };
+
 #endif

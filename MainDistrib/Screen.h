@@ -3,36 +3,35 @@
  * @author <Léo Lefebvre & Estelle Coudon>
  * @brief Fichier de déclaration de la classe Screen
  *********************************************************************/
-#ifndef SCREEN
-#define SCREEN
+#ifndef SCREEN_H
+#define SCREEN_H
 
-#include "HomeAssistantConfig.h"
-#include <time.h>
-#include <TFT_eSPI.h> // Librairie TFT_eSPI
+#include <TFT_eSPI.h> 
 #include <SPI.h>
 
 
-class Screen
-{
-  // Attributs
-  protected :
-  TFT_eSPI tft; //extern
 
-  int centerX;
-  int centerY;
+class Screen {
+  private:
+    TFT_eSPI tft = TFT_eSPI();
+    int centerX, centerY;
 
-  //Constructeurs
-  public :
-  Screen();
+    // Configuration de l'arc de cercle
+    const int ARC_RADIUS_OUTER = 118; // Rayon extérieur
+    const int ARC_RADIUS_INNER = 110;
+    const int ARC_START_ANGLE = 120;
+    const int ARC_END_ANGLE = 240;
+    const int ARC_FULL_SPAN = 120;   //angle de l'arc
 
-  //Déconstructeurs
-  ~Screen();
+  public:
+    Screen();
+    ~Screen();
 
-  //Méthodes
-  void Init();
-  void Test();
-  void Show_time(HomeAssistantConfig HAC);
-};  
+    void Init();
+    uint16_t GetColorForLevel(int level);
+    void UpdateDashboard(String timeStr, int levelPercent);
+    void ShowMessage(String msg);
+    void Refresh();
+};
 
-
-#endif //ends #ifndef SCREEN
+#endif
