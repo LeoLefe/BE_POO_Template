@@ -12,6 +12,15 @@
 #include "NetworkApp.h"
 #include "DistributionManager.h"
 #include "InputManager.h"
+#include "Animals.h"
+
+// Etats de l'application
+enum AppState {
+  STATE_DASHBOARD,
+  STATE_MENU_MAIN,
+  STATE_SHOW_SCHEDULE,
+  STATE_EDIT_NAME
+};
 
 class Application {
   private:
@@ -21,14 +30,31 @@ class Application {
     NetworkApp network; 
     DistributionManager distributor;
     InputManager inputs;
+    Animals myDog;
 
-    unsigned long lastUpdateUI;
+    // Gestion de l'état
+    AppState currentState;
+
+    // Navigation Menu
+    int menuIndex;
+    const char* mainMenuItems[3] = {"Horaires", "Nom Animal", "Retour"};
+    
+    // Navigation Clavier
+    String tempInputString; // Ce qu'on tape
+    int keyboardIndex;
+
+    unsigned long lastUIUpdate;
 
   public:
     Application();
     ~Application();
     void Init();
     void Run();
+    // Fonctions de logique interne
+    void HandleDashboard(InputEvent evt);
+    void HandleMenuMain(InputEvent evt);
+    void HandleKeyboard(InputEvent evt, bool isNumeric);
+    void HandleScheduleView(InputEvent evt);
 };
 
 #endif

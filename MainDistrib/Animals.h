@@ -18,6 +18,21 @@ class Animals {
 
   public:
     Animals();
+    ~Animals();
+
+    // Méthodes pour le nom (utilisées dans le menu)
+    void setName(String n);
+    String getName();
+
+    // Méthodes pour les autres attributs (prêtes pour les futures extensions)
+    void setAge(int a);
+    int getAge();
+    
+    void setHeight(int h);
+    int getHeight();
+    
+    void setWeight(int w);
+    int getWeight();
 };
 
 #endif

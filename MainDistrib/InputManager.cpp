@@ -9,31 +9,21 @@ void InputManager::Init() {
   pinMode(PIN_BP4, INPUT);
 }
 
-bool InputManager::IsManualFeedRequested() {
-  bool currentState = digitalRead(PIN_BP1);
-  bool isPressed = false;
+InputEvent InputManager::ReadEvent() {
+  if (millis() - lastDebounceTime < DEBOUNCE_DELAY) return EVT_NONE;
 
-  // Détection de front montant
-  if (currentState == HIGH && lastStateManual == LOW) {
-    if ((millis() - lastDebounceTime) > DEBOUNCE_DELAY) {
-      isPressed = true;
-      lastDebounceTime = millis();
-    }
+  InputEvent event = EVT_NONE;
+
+  // Lecture des 4 boutons
+  if (digitalRead(PIN_BP1) == HIGH) event = EVT_BACK;
+  else if (digitalRead(PIN_BP2) == HIGH) event = EVT_DOWN;
+  else if (digitalRead(PIN_BP3) == HIGH) event = EVT_UP;
+  else if (digitalRead(PIN_BP4) == HIGH) event = EVT_ENTER;
+
+  if (event != EVT_NONE) {
+    lastDebounceTime = millis(); // Reset timer anti-rebond
+    Serial.println("Bouton appuyé !");
   }
-  lastStateManual = currentState;
-  return isPressed;
-}
 
-bool InputManager::Alphabet() {
-  bool currentState = digitalRead(PIN_BP4);
-  bool isPressed = false;
-
-  if (currentState == HIGH && lastStateManual == LOW) {
-    if ((millis() - lastDebounceTime) > DEBOUNCE_DELAY) {
-      isPressed = true;
-      lastDebounceTime = millis();
-    }
-  }
-  lastStateManual = currentState;
-  return isPressed;
+  return event;
 }
