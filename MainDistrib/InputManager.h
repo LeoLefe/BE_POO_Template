@@ -17,8 +17,8 @@ class InputManager {
     InputManager();
     void Init();
     
-    // Retourne true seulement au moment où on appuie (front montant)
     bool IsManualFeedRequested();
+    bool Alphabet();
 };
 
 #endif

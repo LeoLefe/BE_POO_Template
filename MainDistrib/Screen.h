@@ -9,8 +9,6 @@
 #include <TFT_eSPI.h> 
 #include <SPI.h>
 
-
-
 class Screen {
   private:
     TFT_eSPI tft = TFT_eSPI();

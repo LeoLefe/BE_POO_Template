@@ -33,6 +33,11 @@ void Application::Run() {
     distributor.ForceFeed(&motor);
   }
 
+  // 2. Gestion Inputs (Bouton Manuel)
+  if (inputs.Alphabet()) {
+    screen.ShowMessage("azertyuiopqsdfghj");
+  }
+
   // 3. Gestion Automatique (Horaires)
   distributor.CheckAutoFeed(currentTime, &motor);
 

@@ -13,7 +13,21 @@ bool InputManager::IsManualFeedRequested() {
   bool currentState = digitalRead(PIN_BP1);
   bool isPressed = false;
 
-  // Simple détection de front montant
+  // Détection de front montant
+  if (currentState == HIGH && lastStateManual == LOW) {
+    if ((millis() - lastDebounceTime) > DEBOUNCE_DELAY) {
+      isPressed = true;
+      lastDebounceTime = millis();
+    }
+  }
+  lastStateManual = currentState;
+  return isPressed;
+}
+
+bool InputManager::Alphabet() {
+  bool currentState = digitalRead(PIN_BP4);
+  bool isPressed = false;
+
   if (currentState == HIGH && lastStateManual == LOW) {
     if ((millis() - lastDebounceTime) > DEBOUNCE_DELAY) {
       isPressed = true;
