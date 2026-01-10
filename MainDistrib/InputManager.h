@@ -1,3 +1,8 @@
+/*********************************************************************
+ * @file  InputManager.h
+ * @author <Léo Lefebvre & Estelle Coudon>
+ * @brief Fichier de déclaration de la classe InputManager
+ *********************************************************************/
 #ifndef INPUTMANAGER_H
 #define INPUTMANAGER_H
 

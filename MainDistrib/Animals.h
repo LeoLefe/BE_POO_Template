@@ -1,11 +1,13 @@
 /*********************************************************************
  * @file  Animals.h
  * @author <Léo Lefebvre & Estelle Coudon>
+ * @brief Fichier de déclaration de la classe Animal
  *********************************************************************/
 #ifndef ANIMALS_H
 #define ANIMALS_H
 
 #include <Arduino.h>
+#include <Preferences.h>
 
 class Animals {
   private:
@@ -20,11 +22,13 @@ class Animals {
     Animals();
     ~Animals();
 
-    // Méthodes pour le nom (utilisées dans le menu)
+    // Gestion de la sauvegarde
+    void Load(); // Charge les données au démarrage
+    void Save(); // Ecrit les données dans la mémoire flash
+
     void setName(String n);
     String getName();
 
-    // Méthodes pour les autres attributs (prêtes pour les futures extensions)
     void setAge(int a);
     int getAge();
     
@@ -33,6 +37,9 @@ class Animals {
     
     void setWeight(int w);
     int getWeight();
+
+    void setBehavior(String b);
+    String getBehavior();
 };
 
 #endif

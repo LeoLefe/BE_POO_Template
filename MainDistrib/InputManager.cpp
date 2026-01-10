@@ -1,3 +1,8 @@
+/*********************************************************************
+ * @file  InputManager.cpp
+ * @author <Léo Lefebvre & Estelle Coudon>
+ * @brief Fichier de déclaration de la classe InputManager
+ *********************************************************************/
 #include "InputManager.h"
 
 InputManager::InputManager() : lastStateManual(false), lastDebounceTime(0) {}

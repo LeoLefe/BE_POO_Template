@@ -9,13 +9,15 @@ NetworkApp::NetworkApp() : connected(false) {}
 NetworkApp::~NetworkApp() {}
 
 void NetworkApp::Init() {
+  // Connexion
   WiFi.mode(WIFI_STA);
+  WiFi.setSleep(false); // Désactivation du mode économie d'énergie
   WiFi.begin(ssid, password);
   Serial.print("Connexion WiFi");
   
   int attempts = 0;
   while (WiFi.status() != WL_CONNECTED && attempts < 100) {
-    delay(1000);
+    delay(500);
     Serial.print(".");
     attempts++;
   }

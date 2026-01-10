@@ -23,19 +23,37 @@ void Motor::Disable() {
   digitalWrite(PIN_EN, HIGH); // HIGH = Désactivé
 }
 
-void Motor::Rotate(float turns) {
+void Motor::Start(float turns) {
   Enable();
-  long stepsToMake = (long)(turns * TOTAL_STEPS);
+  int stepsToMake = (int)(turns * MICROSTEPS_PER_REV);
   
   // Direction (par défaut horaire)
   digitalWrite(PIN_DIR, HIGH); 
 
   // Boucle de mouvement
-  for(long i = 0; i < stepsToMake; i++) {
+  for(int i = 0; i < stepsToMake; i++) {
     digitalWrite(PIN_STEP, HIGH);
     delayMicroseconds(500); // Ajuster vitesse ici (plus petit = plus vite)
     digitalWrite(PIN_STEP, LOW);
     delayMicroseconds(500);
+  }
+  
+  Disable(); // On relâche pour économiser l'énergie
+}
+
+void Motor::Start(float turns, int speed) {
+  Enable();
+  int stepsToMake = (int)(turns * MICROSTEPS_PER_REV);
+  
+  // Direction (par défaut horaire)
+  digitalWrite(PIN_DIR, HIGH); 
+
+  // Boucle de mouvement
+  for(int i = 0; i < stepsToMake; i++) {
+    digitalWrite(PIN_STEP, HIGH);
+    delayMicroseconds(speed); // Ajuster vitesse ici (plus petit = plus vite)
+    digitalWrite(PIN_STEP, LOW);
+    delayMicroseconds(speed);
   }
   
   Disable(); // On relâche pour économiser l'énergie

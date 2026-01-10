@@ -14,10 +14,16 @@ private:
   const int PIN_DIR = 12;
   const int PIN_EN = 16;
 
-  // Configuration mécanique
-  const int STEPS_PER_REV = 200;
-  const int MICROSTEPS = 16;  // Si configuré en 1/16 sur le driver
-  const int TOTAL_STEPS = STEPS_PER_REV * MICROSTEPS;
+
+  // Nombre de micro-pas pour 1 tour complet
+  /*  
+    200 = pas de microstep
+    400 = microstep 1/2
+    800 = microstep 1/4
+    1600 = microstep 1/8
+    3200 = microstep 1/16e
+  */
+  const int MICROSTEPS_PER_REV = 3200;
 
 public:
   Motor();
@@ -28,7 +34,8 @@ public:
   void Disable();
 
   // Fait tourner le moteur (fonction bloquante pour l'instant pour assurer la dose)
-  void Rotate(float turns);
+  void Start(float turns);
+  void Start(float turns, int speed); // Réglable en vitesse
 };
 
 #endif

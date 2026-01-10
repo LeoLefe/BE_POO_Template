@@ -1,6 +1,7 @@
 /*********************************************************************
  * @file  NetworkApp.h
  * @author <Léo Lefebvre & Estelle Coudon>
+ * @brief Fichier de déclaration de la classe Connexion
  *********************************************************************/
 #ifndef NETWORKAPP_H
 #define NETWORKAPP_H
