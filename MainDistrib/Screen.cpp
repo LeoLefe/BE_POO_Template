@@ -268,7 +268,7 @@ void Screen::ShowMessage(String msg) {
   tft.setTextColor(TFT_ORANGE, TFT_BLACK);
   tft.setFreeFont(&FreeSansBold9pt7b);
   tft.drawString(msg, centerX, centerY);
-  delay(2000);
+  //delay(2000);
   //Refresh();
 }
 

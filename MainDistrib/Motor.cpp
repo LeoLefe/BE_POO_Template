@@ -37,13 +37,13 @@ void Motor::Start(float turns) {
     digitalWrite(PIN_STEP, LOW);
     delayMicroseconds(500);
   }
-  
   Disable(); // On relâche pour économiser l'énergie
 }
 
 void Motor::Start(float turns, int speed) {
   Enable();
   int stepsToMake = (int)(turns * MICROSTEPS_PER_REV);
+  Serial.println(speed);
   
   // Direction (par défaut horaire)
   digitalWrite(PIN_DIR, HIGH); 
@@ -51,10 +51,9 @@ void Motor::Start(float turns, int speed) {
   // Boucle de mouvement
   for(int i = 0; i < stepsToMake; i++) {
     digitalWrite(PIN_STEP, HIGH);
-    delayMicroseconds(speed); // Ajuster vitesse ici (plus petit = plus vite)
+    delayMicroseconds(speed);
     digitalWrite(PIN_STEP, LOW);
     delayMicroseconds(speed);
   }
-  
   Disable(); // On relâche pour économiser l'énergie
 }

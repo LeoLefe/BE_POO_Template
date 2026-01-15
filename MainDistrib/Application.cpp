@@ -124,7 +124,7 @@ void Application::HandleMenuMain(InputEvent evt) {
       case 0: // Horaires
         currentState = STATE_MENU_SCHEDULE;
         menuIndex = 0;
-        screen.DrawMenu("MENU HORAIRE", animalMenuItems, 6, menuIndex, 0);
+        //screen.DrawMenu("MENU HORAIRE", menuScheduleItems, 6, menuIndex, 0);
         //screen.ShowMessage("Horaires: 08h & 19h"); // Simplifié pour l'instant
         return;
 
@@ -155,13 +155,13 @@ void Application::HandleMenuSchedule(InputEvent evt) {
   
   // Ligne 0 : Le nombre de repas
   sprintf(menuScheduleItemsBuffer[0], "Nb Repas : %d", count);
-  menuSchedulePtrs[0] = menuScheduleItemsBuffer[0];
+  menuScheduleItems[0] = menuScheduleItemsBuffer[0];
 
   // Lignes 1 à N : Les heures
   for (int i = 0; i < count; i++) {
     String timeStr = distributor.getMealTime(i); // Renvoie HH:MM
     sprintf(menuScheduleItemsBuffer[i+1], "Repas %d : %s", i+1, timeStr.c_str());
-    menuSchedulePtrs[i+1] = menuScheduleItemsBuffer[i+1];
+    menuScheduleItems[i+1] = menuScheduleItemsBuffer[i+1];
   }
   
   int totalItems = count + 1; // +1 pour la ligne "Nb Repas"
@@ -170,8 +170,13 @@ void Application::HandleMenuSchedule(InputEvent evt) {
   if (evt == EVT_DOWN) {
     menuIndex++;
     // Logique scroll (reprise de ton code précédent)
-    if (menuIndex >= totalItems) { menuIndex = 0; menuScrollOffset = 0; }
-    else if (menuIndex >= menuScrollOffset + 4) { menuScrollOffset++; }
+    if (menuIndex >= totalItems) { 
+      menuIndex = 0; 
+      menuScrollOffset = 0; 
+    }
+    else if (menuIndex >= menuScrollOffset + 4) { 
+      menuScrollOffset++; 
+    }
   }
   else if (evt == EVT_UP) {
     menuIndex--;
@@ -179,7 +184,9 @@ void Application::HandleMenuSchedule(InputEvent evt) {
         menuIndex = totalItems - 1; 
         menuScrollOffset = max(0, totalItems - 4); 
     }
-    else if (menuIndex < menuScrollOffset) { menuScrollOffset--; }
+    else if (menuIndex < menuScrollOffset) { 
+      menuScrollOffset--; 
+    }
   }
   else if (evt == EVT_BACK) {
     currentState = STATE_MENU_MAIN;
@@ -209,7 +216,7 @@ void Application::HandleMenuSchedule(InputEvent evt) {
 
   // 3. Affichage si changement ou en boucle
   if (currentState == STATE_MENU_SCHEDULE) {
-     screen.DrawMenu("HORAIRES", menuSchedulePtrs, totalItems, menuIndex, menuScrollOffset);
+     screen.DrawMenu("HORAIRES", menuScheduleItems, totalItems, menuIndex, menuScrollOffset);
   }
 }
 
@@ -496,12 +503,14 @@ void Application::HandleAnimalSummary(InputEvent evt) {
 void Application::HandleManualFeed(InputEvent evt) {
   if (evt == EVT_ENTER) {
     // Feedback visuel immédiat
-    screen.ShowMessage("Distribution\nen cours...");
+    Serial.println("Distribution en cours...");
+    screen.ShowMessage("Distribution en cours...");
     
     // Action Moteur (cette fonction est bloquante quelques secondes)
     distributor.ForceFeed(&motor);
     
     // Feedback de fin
+    Serial.println("Termine !");
     screen.ShowMessage("Termine !");
     
     // On réaffiche le menu de distribution

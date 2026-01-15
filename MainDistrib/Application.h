@@ -65,7 +65,7 @@ class Application {
 
     // Sous-menu horaires (Buffers pour l'affichage dynamique du menu)
     char menuScheduleItemsBuffer[6][20]; // 6 lignes max, 20 caractères de large
-    const char* menuSchedulePtrs[6];     // Pointeurs pour DrawMenu
+    const char* menuScheduleItems[6];     // Pointeurs pour DrawMenu
     int selectedMealToEdit; // Quel repas on modifie (0, 1, 2...)
 
     // Sous-menu animal

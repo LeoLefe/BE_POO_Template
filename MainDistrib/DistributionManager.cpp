@@ -94,5 +94,5 @@ void DistributionManager::CheckAutoFeed(String currentTime, Motor* motor) {
 
 void DistributionManager::ForceFeed(Motor* motor) {
   Serial.println("Distribution Manuelle !");
-  motor->Start(0.5); 
+  motor->Start(1); 
 }

@@ -1,18 +1,21 @@
 /*********************************************************************
  * @file  Animals.cpp
  * @author <Léo Lefebvre & Estelle Coudon>
- * @brief Fichier de déclaration de la classe Animal
+ * @brief Fichier de déclaration de la classe Animals
  *********************************************************************/
 #include "Animals.h"
 
-Animals::Animals() {    // Caractéristiques par défaut
-  /*this->name = "Kida";      
-  this->age = 3;
-  this->weight = 7;
-  this->height = 20;
-  this->color = "Noir";
-  this->behavior = "Calme";*/
+Animals::Animals() {}
+Animals::Animals(String _name, Species* _speciesType, int _age, int _height, int _weight, String _color, String _behavior) {
+  this->name = _name;
+  this->speciesType = _speciesType;
+  this->age = _age;
+  this->height = _height;
+  this->weight = _weight;
+  this->color = _color;
+  this->behavior = _behavior;
 }
+
 Animals::~Animals() {}
 
 void Animals::Load() {
@@ -54,6 +57,9 @@ String Animals::getName() {
   return this->name;
 }
 
+Species* Animals::getSpecies(){
+  return this->speciesType;
+}
 
 void Animals::setAge(int a) {
   this->age = a;
@@ -78,10 +84,21 @@ int Animals::getWeight() {
   return this->weight;
 }
 
+void Animals::setColor(String c) { 
+  color = c; 
+}
+String Animals::getColor() { 
+  return color; 
+}
 
 void Animals::setBehavior(String b) { 
   behavior = b; 
 }
 String Animals::getBehavior() { 
   return behavior; 
+}
+
+int Animals::getRationGrams(int ratio)
+{
+  return weight*ratio;
 }
