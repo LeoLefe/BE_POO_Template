@@ -264,3 +264,25 @@ void Screen::DrawAnimalSummary(String name, int age, int weight, int height, Str
   tft.drawString("Caractere : " + behavior, startX, startY + gap*4);
 }
 
+
+void Screen::DrawHourSummary(String H1, String H2, String H3) {
+  Refresh();
+  // Titre
+  tft.setTextColor(TFT_ORANGE, TFT_BLACK);
+  tft.setFreeFont(&FreeSansBold9pt7b);
+  tft.setTextDatum(TC_DATUM);
+  tft.drawString("Fiche Horaires", centerX, 30);
+
+  tft.setFreeFont(&FreeSansBold9pt7b);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.setTextDatum(TL_DATUM); // Top Left pour aligner le texte
+  
+  int startX = 20;
+  int startY = 60;
+  int gap = 28;
+
+  tft.drawString("Heure 1 : " + H1, startX, startY);
+  tft.drawString("Heure 2 : " + H2, startX, startY + gap);
+  tft.drawString("Heure 3 : " + H3, startX, startY + gap*2);
+  
+}

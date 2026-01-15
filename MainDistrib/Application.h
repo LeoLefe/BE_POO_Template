@@ -21,13 +21,12 @@ enum AppState {
 
   // Etats pour le menu principal
   STATE_MENU_MAIN,
-  STATE_SHOW_SCHEDULE,
   STATE_MANUAL_FEED,
 
   // Etats pour le menu Horaires
   STATE_MENU_SCHEDULE,     // Menu liste des horaires
-  STATE_EDIT_MEAL_COUNT,   // Changement du nombre (1-5)
   STATE_EDIT_MEAL_TIME,    // Clavier pour rentrer l'heure
+  STATE_SHOW_HOURS,
 
   // Etats pour le menu Animal
   STATE_MENU_ANIMAL,       // Le sous-menu liste
@@ -55,15 +54,16 @@ class Application {
     const char* mainMenuItems[3] = {"Horaires", "Animal", "Distrib Manuel"};
 
     // Sous-menu horaires (Buffers pour l'affichage dynamique du menu)
-    char menuScheduleItemsBuffer[6][20]; // 6 lignes max, 20 caractères de large
-    const char* menuScheduleItems[6];     // Pointeurs pour DrawMenu
-    int selectedMealToEdit; // Quel repas on modifie (0, 1, 2...)
+    const char* menuScheduleItems[4] = {"Heure 1", "Heure 2", "Heure 3", "Voir horaires"};
 
     // Sous-menu animal
     const char* animalMenuItems[6] = {"Nom", "Age", "Poids", "Taille", "Comportement", "Voir Fiche"};
 
     // Sous-menu comportement
     const char* behaviorItems[2] = {"Calme", "Agressif"};
+
+    // Sous-menu comportement
+    const char* Items[2] = {"Calme", "Agressif"};
     
     // Sous-menu distribution manuelle
     const char* manualMenuItems[1] = {"Lancer la dose"};
@@ -84,13 +84,13 @@ class Application {
     void HandleMenuMain(InputEvent evt);
 
     void HandleMenuSchedule(InputEvent evt);
-    void HandleEditMealCount(InputEvent evt);
-    void HandleEditMealTime(InputEvent evt, bool isNumeric);
+    void HandleEditMealTime(InputEvent evt, bool isNumeric,  int index);
     void HandleManualFeed(InputEvent evt);
 
     void HandleMenuAnimal(InputEvent evt);
     void HandleBehaviorSelect(InputEvent evt);
     void HandleAnimalSummary(InputEvent evt);
+    void HandleHourSummary(InputEvent evt);
 
     void HandleKeyboard(InputEvent evt, bool isNumeric);
 };

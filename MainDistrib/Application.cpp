@@ -54,13 +54,9 @@ void Application::Run() {
     case STATE_MENU_SCHEDULE:
       HandleMenuSchedule(evt);
       break;
-      
-    case STATE_EDIT_MEAL_COUNT:
-      HandleEditMealCount(evt);
-      break;
 
     case STATE_EDIT_MEAL_TIME:
-      HandleEditMealTime(evt, true);
+      HandleEditMealTime(evt, true, menuIndex);
       break;
 
     case STATE_MANUAL_FEED:
@@ -77,6 +73,10 @@ void Application::Run() {
 
     case STATE_SHOW_SUMMARY:
       HandleAnimalSummary(evt);
+      break;
+
+    case STATE_SHOW_HOURS:
+      HandleHourSummary(evt);
       break;
 
     case STATE_EDIT_FIELD:
@@ -124,8 +124,7 @@ void Application::HandleMenuMain(InputEvent evt) {
       case 0: // Horaires
         currentState = STATE_MENU_SCHEDULE;
         menuIndex = 0;
-        //screen.DrawMenu("MENU HORAIRE", menuScheduleItems, 6, menuIndex, 0);
-        //screen.ShowMessage("Horaires: 08h & 19h"); // Simplifié pour l'instant
+        screen.DrawMenu("MENU HORAIRE", menuScheduleItems, 4, menuIndex, 0);
         return;
 
       case 1: // Gestion Animal
@@ -149,135 +148,50 @@ void Application::HandleMenuMain(InputEvent evt) {
 }
 
 void Application::HandleMenuSchedule(InputEvent evt) {
-  
-  // 1. Préparation des données du menu
-  int count = distributor.getMealCount();
-  
-  // Ligne 0 : Le nombre de repas
-  sprintf(menuScheduleItemsBuffer[0], "Nb Repas : %d", count);
-  menuScheduleItems[0] = menuScheduleItemsBuffer[0];
+  if (evt == EVT_NONE) return;
 
-  // Lignes 1 à N : Les heures
-  for (int i = 0; i < count; i++) {
-    String timeStr = distributor.getMealTime(i); // Renvoie HH:MM
-    sprintf(menuScheduleItemsBuffer[i+1], "Repas %d : %s", i+1, timeStr.c_str());
-    menuScheduleItems[i+1] = menuScheduleItemsBuffer[i+1];
-  }
-  
-  int totalItems = count + 1; // +1 pour la ligne "Nb Repas"
-
-  // 2. Gestion Navigation
   if (evt == EVT_DOWN) {
     menuIndex++;
-    // Logique scroll (reprise de ton code précédent)
-    if (menuIndex >= totalItems) { 
-      menuIndex = 0; 
-      menuScrollOffset = 0; 
-    }
-    else if (menuIndex >= menuScrollOffset + 4) { 
-      menuScrollOffset++; 
-    }
-  }
+    if (menuIndex > 3) menuIndex = 0; // Bouclage
+  } 
   else if (evt == EVT_UP) {
     menuIndex--;
-    if (menuIndex < 0) { 
-        menuIndex = totalItems - 1; 
-        menuScrollOffset = max(0, totalItems - 4); 
-    }
-    else if (menuIndex < menuScrollOffset) { 
-      menuScrollOffset--; 
-    }
-  }
+    if (menuIndex < 0) menuIndex = 3;
+  } 
   else if (evt == EVT_BACK) {
+    // Retour au menu principal
     currentState = STATE_MENU_MAIN;
-    menuIndex = 0; // Retour sur "Horaires"
+    menuIndex = 0; // On se remet sur "Horaires"
     screen.DrawMenu("MENU PRINCIPAL", mainMenuItems, 3, menuIndex, 0);
     return;
   }
   else if (evt == EVT_ENTER) {
-    if (menuIndex == 0) {
-      // Modification du nombre de repas
-      currentState = STATE_EDIT_MEAL_COUNT;
-      // On affiche une petite interface simple ou on réutilise le menu
-      screen.ShowMessage("Changer Nb..."); 
-      // Astuce: On redessine juste le menu mais on change l'état pour capturer HAUT/BAS différemment
-    } else {
-      // Modification d'une heure spécifique
-      selectedMealToEdit = menuIndex - 1; // Car l'index 0 est le compteur
-      currentState = STATE_EDIT_MEAL_TIME;
-      tempInputString = ""; // Reset buffer clavier
-      keyboardIndex = 0;
-      // On pré-remplit avec l'heure actuelle sans les ':' pour éditer facilement ?
-      // Pour faire simple : on demande de tout retaper
-      screen.DrawKeyboard("HEURE (HHMM)", "", 0, true); // true = Numérique 
-      return;
+    tempInputString = ""; // Reset buffer clavier
+    keyboardIndex = 0;    // Reset curseur clavier
+
+    switch (menuIndex) {
+      case 0: // Heure 1
+      case 1: // Heure 2
+      case 2: // Heure 3
+        
+        currentState = STATE_EDIT_MEAL_TIME;
+        HandleEditMealTime(evt, true, menuIndex);
+        break;
+      case 3: // Fiche horaire
+        currentState = STATE_SHOW_HOURS;
+        screen.DrawHourSummary(distributor.getMealTime(0), distributor.getMealTime(1), distributor.getMealTime(2));
+        break;
     }
-  }
-
-  // 3. Affichage si changement ou en boucle
-  if (currentState == STATE_MENU_SCHEDULE) {
-     screen.DrawMenu("HORAIRES", menuScheduleItems, totalItems, menuIndex, menuScrollOffset);
-  }
-}
-
-void Application::HandleEditMealCount(InputEvent evt)
-{
-  //currentState = STATE_EDIT_FIELD;
-  //screen.DrawKeyboard("Nb repas", String(distributor.getMealCount()), 0, true);
-
-  int maxKeys = screen.GetKeyCount(true);
-  if (evt == EVT_DOWN) { keyboardIndex++; if (keyboardIndex >= maxKeys) keyboardIndex = 0; }
-  else if (evt == EVT_UP) { keyboardIndex--; if (keyboardIndex < 0) keyboardIndex = maxKeys - 1; }
-  else if (evt == EVT_BACK) {
-    currentState = STATE_MENU_SCHEDULE;
     return;
   }
-  else if (evt == EVT_ENTER) {
-    char key = screen.GetKeyChar(keyboardIndex, true);
-    
-    if (key == '<') { 
-       if (tempInputString.length() > 0) tempInputString.remove(tempInputString.length() - 1);
-    }
-    else if (key == '>')
-    { 
-      try
-      {
-        if (tempInputString.length() == 1 && tempInputString.toInt() <= 5)
-        {
-          distributor.setMealCount(tempInputString.toInt());
-          distributor.Save();
-          
-          currentState = STATE_MENU_SCHEDULE;
-          return;
-        } 
-        else
-        {
-          throw DistribException(3, "Nb Repas < 6 !");
-        }
-      }
-      catch (DistribException ex)
-      {
-        switch (ex.exType)
-        {
-          case 3:
-            screen.ShowMessage(ex.exMessage);
-            delay(1000);
-            tempInputString = ""; // Reset
-            break;
-          
-          default:
-            break;
-        }
-      }
-    }
-    else { // Chiffre
-       if (tempInputString.length() < 1) tempInputString += key;
-    }
+
+  if (currentState == STATE_MENU_SCHEDULE && evt != EVT_NONE) {
+    screen.DrawMenu("MENU HORAIRE", menuScheduleItems, 4, menuIndex, 0);
   }
-  screen.DrawKeyboard("Nb repas", tempInputString, keyboardIndex, true);
 }
 
-void Application::HandleEditMealTime(InputEvent evt, bool isNumeric) {
+void Application::HandleEditMealTime(InputEvent evt, bool isNumeric, int index) {
+  if (evt == EVT_NONE) return;
   // On réutilise la logique HandleKeyboard générique, 
   // MAIS on doit intercepter la validation (ENTER -> '>') spécifique
 
@@ -292,6 +206,7 @@ void Application::HandleEditMealTime(InputEvent evt, bool isNumeric) {
   else if (evt == EVT_UP) { keyboardIndex--; if (keyboardIndex < 0) keyboardIndex = maxKeys - 1; }
   else if (evt == EVT_BACK) {
     currentState = STATE_MENU_SCHEDULE;
+    screen.DrawMenu("MENU HORAIRE", menuScheduleItems, 4, menuIndex, 0);
     return;
   }
   else if (evt == EVT_ENTER) {
@@ -314,10 +229,11 @@ void Application::HandleEditMealTime(InputEvent evt, bool isNumeric) {
           if (hh.toInt() < 24 && mm.toInt() < 60)
           {
             String formattedTime = hh + ":" + mm;
-            distributor.setMealTime(selectedMealToEdit, formattedTime);
+            distributor.setMealTime(index, formattedTime);
             distributor.Save();
             
             currentState = STATE_MENU_SCHEDULE;
+            screen.DrawMenu("MENU HORAIRE", menuScheduleItems, 4, menuIndex, 0);
             return;
           } 
           else
@@ -347,11 +263,13 @@ void Application::HandleEditMealTime(InputEvent evt, bool isNumeric) {
       }
     }
     else { // Chiffre
-       if (tempInputString.length() < 4) tempInputString += key;
+      if (tempInputString.length() < 4){
+        tempInputString += key;
+      }
     }
   }
 
-  screen.DrawKeyboard("REPAS " + String(selectedMealToEdit + 1), tempInputString, keyboardIndex, true);
+  screen.DrawKeyboard("Repas " + (String)(index+1), tempInputString, keyboardIndex, true);
 }
 
 void Application::HandleMenuAnimal(InputEvent evt) {
@@ -538,6 +456,13 @@ void Application::HandleAnimalSummary(InputEvent evt) {
   if (evt == EVT_BACK || evt == EVT_ENTER) {
     currentState = STATE_MENU_ANIMAL;
     screen.DrawMenu("MENU ANIMAL", animalMenuItems, 6, menuIndex, 2);
+  }
+}
+
+void Application::HandleHourSummary(InputEvent evt) {
+  if (evt == EVT_BACK || evt == EVT_ENTER) {
+    currentState = STATE_MENU_SCHEDULE;
+    screen.DrawMenu("MENU HORAIRE", menuScheduleItems, 4, menuIndex, 0);
   }
 }
 

@@ -43,6 +43,7 @@ class Screen {
     void ShowMessage(String msg);
     
     void DrawAnimalSummary(String name, int age, int weight, int height, String behavior);
+    void DrawHourSummary(String H1, String H2, String H3);
 };
 
 #endif

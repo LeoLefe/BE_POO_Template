@@ -48,15 +48,6 @@ void DistributionManager::Save() {
   Serial.println("Horaires sauvegardés !");
 }
 
-int DistributionManager::getMealCount() { 
-  return mealCount; 
-}
-void DistributionManager::setMealCount(int n) {
-  if (n < 1) n = 1;
-  if (n > MAX_MEALS) n = MAX_MEALS;
-  mealCount = n;
-}
-
 String DistributionManager::getMealTime(int index) {
   if (index < 0 || index >= MAX_MEALS) return "00:00:00";
   // On retourne juste HH:MM pour l'affichage (sans les secondes)
