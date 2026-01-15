@@ -13,6 +13,7 @@
 #include "DistributionManager.h"
 #include "InputManager.h"
 #include "Animals.h"
+#include "DistribException.h"
 
 // Etats de l'application
 enum AppState {
@@ -35,15 +36,6 @@ enum AppState {
   STATE_SHOW_SUMMARY       // La fiche technique
 };
 
-// Cible de l'édition (pour savoir quoi sauvegarder quand on valide le clavier)
-enum EditTarget {
-  TARGET_NONE,
-  TARGET_NAME,
-  TARGET_AGE,
-  TARGET_WEIGHT,
-  TARGET_HEIGHT
-};
-
 class Application {
   private:
     Motor motor;
@@ -52,11 +44,10 @@ class Application {
     NetworkApp network; 
     DistributionManager distributor;
     InputManager inputs;
-    Animals myAnimal;
+    Animals pets;
 
     // Gestion de l'état
     AppState currentState;
-    EditTarget currentEditTarget; // Pour savoir si on édite le nom ou le poids
 
     // Navigation Menu
     int menuIndex;

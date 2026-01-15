@@ -99,38 +99,7 @@ void Screen::DrawDashboard(String timeStr, int levelPercent, String petName) {
 }
 
 // Menu statique
-void Screen::DrawMenu(String title, const char* items[], int itemCount, int selectedIndex) {
-  Refresh();
 
-  // Titre
-  tft.setTextColor(TFT_ORANGE, TFT_BLACK);
-  tft.setFreeFont(&FreeSansBold9pt7b);
-  tft.setTextDatum(TC_DATUM); // Top Center
-  tft.drawString(title, centerX, 50);
-
-  // Liste
-  int startY = 80;
-  int stepY = 30;
-
-  tft.setFreeFont(&FreeSansBold9pt7b);
-  tft.setTextDatum(MC_DATUM);
-
-  for (int i = 0; i < itemCount; i++) {
-
-    int yPos = startY + (i * stepY);
-    
-    if (i == selectedIndex) {
-      // Élément sélectionné : Fond Blanc, Texte Noir
-      tft.fillRoundRect(40, yPos - 12, 160, 24, 5, TFT_WHITE);
-      tft.setTextColor(TFT_BLACK, TFT_WHITE);
-    }
-    else {
-      // Normal : Fond Noir, Texte Blanc
-      tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    }
-    tft.drawString(items[i], centerX, yPos);
-  }
-}
 
 // Menu défillant
 void Screen::DrawMenu(String title, const char* items[], int itemCount, int selectedIndex, int scrollOffset) {

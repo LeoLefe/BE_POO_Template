@@ -19,11 +19,11 @@ void Application::Init() {
   distributor.Init();
 
   // Chargement des données sauvegardées en mémoire
-  myAnimal.Load();
+  pets.Load();
   
   Serial.println("Application Prête !");
   screen.Refresh();
-  screen.DrawDashboard("Init...", 0, myAnimal.getName()); // Ecran initialisation
+  screen.DrawDashboard("Init...", 0, pets.getName()); // Ecran initialisation
 }
 
 void Application::Run() {
@@ -42,7 +42,7 @@ void Application::Run() {
       // Update ecran de base
       if (millis() - lastUIUpdate > 1000) {
          uint8_t level = sensor.GetLevelPercent();
-         screen.DrawDashboard(currentTime, level, myAnimal.getName());
+         screen.DrawDashboard(currentTime, level, pets.getName());
          lastUIUpdate = millis();
       }
       break;
@@ -81,7 +81,7 @@ void Application::Run() {
 
     case STATE_EDIT_FIELD:
       // On décide si le clavier est numérique ou alpha selon la cible
-      bool isNum = (currentEditTarget != TARGET_NAME);
+      bool isNum = (menuIndex != 0); //menuindex != 0
       HandleKeyboard(evt, isNum);
       break;
   }
@@ -97,7 +97,7 @@ void Application::HandleDashboard(InputEvent evt) {
   if (evt != EVT_NONE) {
     currentState = STATE_MENU_MAIN;
     menuIndex = 0; // Reset sélection
-    screen.DrawMenu("MENU PRINCIPAL", mainMenuItems, 3, menuIndex);
+    screen.DrawMenu("MENU PRINCIPAL", mainMenuItems, 3, menuIndex, 0);
   }
 }
 
@@ -115,7 +115,7 @@ void Application::HandleMenuMain(InputEvent evt) {
   else if (evt == EVT_BACK) {
     currentState = STATE_DASHBOARD;
     screen.Refresh();
-    screen.DrawDashboard("Wait...", 0, myAnimal.getName());
+    screen.DrawDashboard("Wait...", 0, pets.getName());
     return;
   }
   else if (evt == EVT_ENTER) {
@@ -137,14 +137,14 @@ void Application::HandleMenuMain(InputEvent evt) {
 
       case 2: // Distribution manuelle
         currentState = STATE_MANUAL_FEED;
-        screen.DrawMenu("DISTRIBUTION", manualMenuItems, 1, 0);
+        screen.DrawMenu("DISTRIBUTION", manualMenuItems, 1, 0, 0);
         return;
     }
   }
 
   // Si on est toujours dans le menu, on redessine pour mettre à jour la surbrillance
   if (currentState == STATE_MENU_MAIN) {
-    screen.DrawMenu("MENU PRINCIPAL", mainMenuItems, 3, menuIndex);
+    screen.DrawMenu("MENU PRINCIPAL", mainMenuItems, 3, menuIndex, 0);
   }
 }
 
@@ -209,7 +209,7 @@ void Application::HandleMenuSchedule(InputEvent evt) {
       keyboardIndex = 0;
       // On pré-remplit avec l'heure actuelle sans les ':' pour éditer facilement ?
       // Pour faire simple : on demande de tout retaper
-      screen.DrawKeyboard("HEURE (HHMM)", "", 0, true); // true = Numérique
+      screen.DrawKeyboard("HEURE (HHMM)", "", 0, true); // true = Numérique 
       return;
     }
   }
@@ -220,35 +220,61 @@ void Application::HandleMenuSchedule(InputEvent evt) {
   }
 }
 
-void Application::HandleEditMealCount(InputEvent evt) {
-  int currentCount = distributor.getMealCount();
-  bool changed = false;
+void Application::HandleEditMealCount(InputEvent evt)
+{
+  //currentState = STATE_EDIT_FIELD;
+  //screen.DrawKeyboard("Nb repas", String(distributor.getMealCount()), 0, true);
 
-  if (evt == EVT_UP) {
-    currentCount++;
-    changed = true;
-  } else if (evt == EVT_DOWN) {
-    currentCount--;
-    changed = true;
-  } else if (evt == EVT_ENTER || evt == EVT_BACK) {
-    // Validation et Sauvegarde
-    distributor.Save();
+  int maxKeys = screen.GetKeyCount(true);
+  if (evt == EVT_DOWN) { keyboardIndex++; if (keyboardIndex >= maxKeys) keyboardIndex = 0; }
+  else if (evt == EVT_UP) { keyboardIndex--; if (keyboardIndex < 0) keyboardIndex = maxKeys - 1; }
+  else if (evt == EVT_BACK) {
     currentState = STATE_MENU_SCHEDULE;
-    return; // La boucle principale redessinera le menu
+    return;
   }
-
-  if (changed) {
-    distributor.setMealCount(currentCount); // Gère les limites 1-5 en interne
+  else if (evt == EVT_ENTER) {
+    char key = screen.GetKeyChar(keyboardIndex, true);
     
-    // Feedback visuel : On met à jour le texte du menu "Nb Repas" en direct
-    // Pour faire propre, on peut afficher un message temporaire ou juste redessiner le menu
-    // Ici, comme on est en STATE_EDIT_MEAL_COUNT, on retourne dans STATE_MENU_SCHEDULE
-    // pour voir la liste s'agrandir/rétrécir instantanément ?
-    // Non, restons en mode édition mais mettons à jour l'écran :
-    
-    screen.ShowMessage("Nb: " + String(distributor.getMealCount()));
-    delay(200); // Petit délai
+    if (key == '<') { 
+       if (tempInputString.length() > 0) tempInputString.remove(tempInputString.length() - 1);
+    }
+    else if (key == '>')
+    { 
+      try
+      {
+        if (tempInputString.length() == 1 && tempInputString.toInt() <= 5)
+        {
+          distributor.setMealCount(tempInputString.toInt());
+          distributor.Save();
+          
+          currentState = STATE_MENU_SCHEDULE;
+          return;
+        } 
+        else
+        {
+          throw DistribException(3, "Nb Repas < 6 !");
+        }
+      }
+      catch (DistribException ex)
+      {
+        switch (ex.exType)
+        {
+          case 3:
+            screen.ShowMessage(ex.exMessage);
+            delay(1000);
+            tempInputString = ""; // Reset
+            break;
+          
+          default:
+            break;
+        }
+      }
+    }
+    else { // Chiffre
+       if (tempInputString.length() < 1) tempInputString += key;
+    }
   }
+  screen.DrawKeyboard("Nb repas", tempInputString, keyboardIndex, true);
 }
 
 void Application::HandleEditMealTime(InputEvent evt, bool isNumeric) {
@@ -274,29 +300,51 @@ void Application::HandleEditMealTime(InputEvent evt, bool isNumeric) {
     if (key == '<') { 
        if (tempInputString.length() > 0) tempInputString.remove(tempInputString.length() - 1);
     }
-    else if (key == '>') { // VALIDER
+    else if (key == '>')
+    { // VALIDER
        // Validation du format HHMM
-       if (tempInputString.length() == 4) {
-         String hh = tempInputString.substring(0, 2);
-         String mm = tempInputString.substring(2, 4);
-         
-         // Vérif basique
-         if (hh.toInt() < 24 && mm.toInt() < 60) {
-           String formattedTime = hh + ":" + mm;
-           distributor.setMealTime(selectedMealToEdit, formattedTime);
-           distributor.Save();
-           
-           currentState = STATE_MENU_SCHEDULE;
-           return;
-         } else {
-           screen.ShowMessage("Heure Invalide !");
-           delay(1000);
-           tempInputString = ""; // Reset
-         }
-       } else {
-           screen.ShowMessage("Format HHMM SVP");
-           delay(1000);
-       }
+      try
+      {
+        if (tempInputString.length() == 4)
+        {
+          String hh = tempInputString.substring(0, 2);
+          String mm = tempInputString.substring(2, 4);
+          
+          // Vérif basique
+          if (hh.toInt() < 24 && mm.toInt() < 60)
+          {
+            String formattedTime = hh + ":" + mm;
+            distributor.setMealTime(selectedMealToEdit, formattedTime);
+            distributor.Save();
+            
+            currentState = STATE_MENU_SCHEDULE;
+            return;
+          } 
+          else
+          {
+            throw DistribException(2, "Heure Invalide !");
+          }
+        }
+        else
+        {
+          throw DistribException(1, "Format HHMM SVP");
+        }
+      }
+      catch (DistribException ex)
+      {
+        switch (ex.exType)
+        {
+          case 2:
+          case 1:
+            screen.ShowMessage(ex.exMessage);
+            delay(1000);
+            tempInputString = ""; // Reset
+            break;
+          
+          default:
+            break;
+        }
+      }
     }
     else { // Chiffre
        if (tempInputString.length() < 4) tempInputString += key;
@@ -338,7 +386,7 @@ void Application::HandleMenuAnimal(InputEvent evt) {
     // Retour au menu principal
     currentState = STATE_MENU_MAIN;
     menuIndex = 1; // On se remet sur "Animal"
-    screen.DrawMenu("MENU PRINCIPAL", mainMenuItems, 3, menuIndex);
+    screen.DrawMenu("MENU PRINCIPAL", mainMenuItems, 3, menuIndex, 0);
     return;
   }
   else if (evt == EVT_ENTER) {
@@ -348,33 +396,29 @@ void Application::HandleMenuAnimal(InputEvent evt) {
 
     switch (menuIndex) {
       case 0: // Nom
-        currentEditTarget = TARGET_NAME;
         currentState = STATE_EDIT_FIELD;
-        screen.DrawKeyboard("Nom de l'animal", myAnimal.getName(), 0, false); // false = Alpha
+        screen.DrawKeyboard("Nom de l'animal", pets.getName(), 0, false); // false = Alpha
         break;
       case 1: // Age
-        currentEditTarget = TARGET_AGE;
         currentState = STATE_EDIT_FIELD;
-        screen.DrawKeyboard("Age", String(myAnimal.getAge()), 0, true); // true = Num
+        screen.DrawKeyboard("Age", String(pets.getAge()), 0, true); // true = Num
         break;
       case 2: // Poids
-        currentEditTarget = TARGET_WEIGHT;
         currentState = STATE_EDIT_FIELD;
-        screen.DrawKeyboard("Poids (kg)", String(myAnimal.getWeight()), 0, true);
+        screen.DrawKeyboard("Poids (kg)", String(pets.getWeight()), 0, true);
         break;
       case 3: // Taille
-        currentEditTarget = TARGET_HEIGHT;
         currentState = STATE_EDIT_FIELD;
-        screen.DrawKeyboard("Taille (cm)", String(myAnimal.getHeight()), 0, true);
+        screen.DrawKeyboard("Taille (cm)", String(pets.getHeight()), 0, true);
         break;
       case 4: // Comportement (Pas de clavier, mais un autre menu)
         currentState = STATE_SELECT_BEHAVIOR;
         menuIndex = 0;
-        screen.DrawMenu("Comportement", behaviorItems, 2, 0);
+        screen.DrawMenu("Comportement", behaviorItems, 2, 0, 0);
         break;
       case 5: // Voir Fiche
         currentState = STATE_SHOW_SUMMARY;
-        screen.DrawAnimalSummary(myAnimal.getName(), myAnimal.getAge(), myAnimal.getWeight(), myAnimal.getHeight(), myAnimal.getBehavior());
+        screen.DrawAnimalSummary(pets.getName(), pets.getAge(), pets.getWeight(), pets.getHeight(), pets.getBehavior());
         break;
     }
     return;
@@ -412,30 +456,27 @@ void Application::HandleKeyboard(InputEvent evt, bool isNumeric) {
     else if (key == '>') { // OK Valider
       
       // On regarde ce qu'on était en train d'éditer
-      switch (currentEditTarget) {
-        case TARGET_NAME:
-          myAnimal.setName(tempInputString);
+      switch (menuIndex) {
+        case 0:
+          pets.setName(tempInputString);
           break;
-        case TARGET_AGE:
-          myAnimal.setAge(tempInputString.toInt());
+        case 1:
+          pets.setAge(tempInputString.toInt());
           break;
-        case TARGET_WEIGHT:
-          myAnimal.setWeight(tempInputString.toInt());
+        case 2:
+          pets.setWeight(tempInputString.toInt());
           break;
-        case TARGET_HEIGHT:
-          myAnimal.setHeight(tempInputString.toInt());
+        case 3:
+          pets.setHeight(tempInputString.toInt());
           break;
       }
 
       // Sauvegarde en mémoire ROM
-      myAnimal.Save();
+      pets.Save();
       
       // Retour menu
       currentState = STATE_MENU_ANIMAL;
-      currentEditTarget = TARGET_NONE; // Reset sécurité
-      //menuIndex = 0;
       screen.DrawMenu("MENU ANIMAL", animalMenuItems, 6, menuIndex, 0);
-      return;
       return;
     }
     else { // Lettre normale
@@ -453,10 +494,10 @@ void Application::HandleKeyboard(InputEvent evt, bool isNumeric) {
 
   // Redessiner clavier
   String titre = "Valeur";
-  if (currentEditTarget == TARGET_NAME) titre = "Nom";
-  else if (currentEditTarget == TARGET_AGE) titre = "Age";
-  else if (currentEditTarget == TARGET_WEIGHT) titre = "Poids";
-  else if (currentEditTarget == TARGET_HEIGHT) titre = "Taille";
+  if (menuIndex == 0) titre = "Nom";
+  else if (menuIndex == 1) titre = "Age";
+  else if (menuIndex == 2) titre = "Poids";
+  else if (menuIndex == 3) titre = "Taille";
   screen.DrawKeyboard(titre, tempInputString, keyboardIndex, isNumeric);
 }
 
@@ -469,11 +510,11 @@ void Application::HandleBehaviorSelect(InputEvent evt) {
   }
   else if (evt == EVT_ENTER) {
     // Sauvegarde
-    if (menuIndex == 0) myAnimal.setBehavior("Calme");
-    else myAnimal.setBehavior("Agressif");
+    if (menuIndex == 0) pets.setBehavior("Calme");
+    else pets.setBehavior("Agressif");
 
     // Sauvegarde en mémoire ROM
-    myAnimal.Save();
+    pets.Save();
 
     // Retour
     currentState = STATE_MENU_ANIMAL;
@@ -489,7 +530,7 @@ void Application::HandleBehaviorSelect(InputEvent evt) {
   }
 
   if (currentState == STATE_SELECT_BEHAVIOR && evt != EVT_NONE) {
-    screen.DrawMenu("COMPORTEMENT", behaviorItems, 2, menuIndex);
+    screen.DrawMenu("COMPORTEMENT", behaviorItems, 2, menuIndex, 0);
   }
 }
 
@@ -515,10 +556,10 @@ void Application::HandleManualFeed(InputEvent evt) {
     
     // On réaffiche le menu de distribution
     currentState = STATE_MANUAL_FEED;
-    screen.DrawMenu("DISTRIBUTION", manualMenuItems, 1, 0);
+    screen.DrawMenu("DISTRIBUTION", manualMenuItems, 1, 0, 0);
   }
   else if (evt == EVT_BACK) {
     currentState = STATE_MENU_MAIN;
-    screen.DrawMenu("MENU PRINCIPAL", mainMenuItems, 3, menuIndex);
+    screen.DrawMenu("MENU PRINCIPAL", mainMenuItems, 3, menuIndex, 0);
   }
 }
