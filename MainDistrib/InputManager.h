@@ -25,7 +25,7 @@ class InputManager {
     const int PIN_BP4 = 26;
     bool lastStateManual;
     unsigned long lastDebounceTime;
-    const unsigned long DEBOUNCE_DELAY = 150;
+    const unsigned long DEBOUNCE_DELAY = 300;
 
   public:
     InputManager();

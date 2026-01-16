@@ -10,7 +10,7 @@ Dog::Dog() {
   sPClass = Mammal;
   diet = DogKibble;
   lifespan = 11;
-  rationCoefficient = 20;
+  rationCoefficient = 3;
 }
 
 Dog::~Dog() {}

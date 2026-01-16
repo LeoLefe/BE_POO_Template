@@ -10,6 +10,6 @@ Cat::Cat() {
   sPClass = Mammal;
   diet = CatKibble;
   lifespan = 18;
-  rationCoefficient = 15;
+  rationCoefficient = 2;
 }
 Cat::~Cat() {}

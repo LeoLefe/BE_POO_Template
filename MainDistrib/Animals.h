@@ -8,7 +8,12 @@
 
 #include <Arduino.h>
 #include <Preferences.h>
-#include <Species.h>
+#include "Species.h"
+#include "Dog.h"
+#include "Cat.h"
+#include "Whale.h"
+#include "Horse.h"
+#include "Mouse.h"
 
 class Animals {
   private:
@@ -17,7 +22,6 @@ class Animals {
     int age;
     int height;
     int weight;
-    String color;
     String behavior;
 
   public:
@@ -32,6 +36,7 @@ class Animals {
     void setName(String n);
     String getName();
 
+    void setSpecies(Species* s);
     Species* getSpecies();
 
     void setAge(int a);
@@ -42,9 +47,6 @@ class Animals {
     
     void setWeight(int w);
     int getWeight();
-
-    void setColor(String c);
-    String getColor();
 
     void setBehavior(String b);
     String getBehavior();

@@ -30,8 +30,8 @@ class DistributionManager {
     String getMealTime(int index);
     void setMealTime(int index, String timeStr); // format "HH:MM"
 
-    void CheckAutoFeed(String currentTime, Motor* motor); // Passe le moteur en paramètre
-    void ForceFeed(Motor* motor);
+    void CheckAutoFeed(String currentTime, Motor* motor, int coeff); // Passe le moteur en paramètre
+    void ForceFeed(Motor* motor, int coeff);
 };
 
 #endif

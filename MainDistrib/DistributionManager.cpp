@@ -60,7 +60,7 @@ void DistributionManager::setMealTime(int index, String timeStr) {
   mealTimes[index] = timeStr;
 }
 
-void DistributionManager::CheckAutoFeed(String currentTime, Motor* motor) {
+void DistributionManager::CheckAutoFeed(String currentTime, Motor* motor, int coeff) {
   // Extraction de la minute actuelle pour le flag anti-répétition
   int currentMinute = currentTime.substring(3, 5).toInt();
 
@@ -78,12 +78,12 @@ void DistributionManager::CheckAutoFeed(String currentTime, Motor* motor) {
 
   if (feedNow) {
     Serial.println("Distribution Automatique !");
-    motor->Start(1.0, 800); // 1 tour
+    motor->Start((1.0*coeff), 800); // 1 tour
     lastFedMinute = currentMinute; // Marque la minute comme traitée
   }
 }
 
-void DistributionManager::ForceFeed(Motor* motor) {
+void DistributionManager::ForceFeed(Motor* motor, int coeff) {
   Serial.println("Distribution Manuelle !");
-  motor->Start(1); 
+  motor->Start(1.0*coeff); 
 }

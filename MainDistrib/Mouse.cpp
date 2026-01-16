@@ -10,6 +10,6 @@ Mouse::Mouse() {
   sPClass = Mammal;
   diet = Cheese;
   lifespan = 2;
-  rationCoefficient = 3;
+  rationCoefficient = 1;
 }
 Mouse::~Mouse() {}

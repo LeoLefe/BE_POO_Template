@@ -10,6 +10,6 @@ Horse::Horse() {
   sPClass = Mammal;
   diet = Hay;
   lifespan = 25;
-  rationCoefficient = 50;
+  rationCoefficient = 4;
 }
 Horse::~Horse() {}

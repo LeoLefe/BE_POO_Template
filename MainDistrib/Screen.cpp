@@ -241,7 +241,7 @@ void Screen::ShowMessage(String msg) {
   //Refresh();
 }
 
-void Screen::DrawAnimalSummary(String name, int age, int weight, int height, String behavior) {
+void Screen::DrawAnimalSummary(String name, String speciesName, int age, int weight, int height, String behavior) {
   Refresh();
   // Titre
   tft.setTextColor(TFT_ORANGE, TFT_BLACK);
@@ -257,7 +257,7 @@ void Screen::DrawAnimalSummary(String name, int age, int weight, int height, Str
   int startY = 60;
   int gap = 28;
 
-  tft.drawString("Nom : " + name, startX, startY);
+  tft.drawString("Nom : " + name + " -> " + speciesName, startX, startY);
   tft.drawString("Age : " + String(age) + " ans", startX, startY + gap);
   tft.drawString("Poids : " + String(weight) + " kg", startX, startY + gap*2);
   tft.drawString("Taille : " + String(height) + " cm", startX, startY + gap*3);

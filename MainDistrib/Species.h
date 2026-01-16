@@ -30,7 +30,7 @@ class Species {
     String speciesName;
     SpeciesClass sPClass;
     SpeciesDiet diet;
-    int lifespan;// type de croquette différent en focntion del'âge (chaton, vieux chat...)
+    int lifespan;// type de croquette différent en focntion de l'âge (chaton, vieux chat...)
     int rationCoefficient;
 
   public:
@@ -48,6 +48,10 @@ class Species {
     
     void setLifespan(int spL);
     int getLifespan();
+ 
+    void setRationCoef(int spRC);
+    int getRationCoef();
+ 
     
     virtual String getSound() = 0;
 };

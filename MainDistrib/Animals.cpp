@@ -1,3 +1,4 @@
+#include "Species.h"
 /*********************************************************************
  * @file  Animals.cpp
  * @author <Léo Lefebvre & Estelle Coudon>
@@ -12,7 +13,6 @@ Animals::Animals(String _name, Species* _speciesType, int _age, int _height, int
   this->age = _age;
   this->height = _height;
   this->weight = _weight;
-  this->color = _color;
   this->behavior = _behavior;
 }
 
@@ -28,8 +28,28 @@ void Animals::Load() {
   this->age = prefs.getInt("age", 3);
   this->weight = prefs.getInt("weight", 7);
   this->height = prefs.getInt("height", 20);
-  this->behavior = prefs.getString("behav", "Calme");
+  this->behavior = prefs.getString("behav", "Calme");  
 
+  // On récupère le nom de l'espèce sauvegardé (ex: "Chat", "Chien")
+  String savedSpeciesName = prefs.getString("species", "Chien");
+
+  // On recrée l'objet correspondant au nom
+  if (savedSpeciesName == "Chien") {
+      this->speciesType = new Dog();
+  }
+  else if (savedSpeciesName == "Chat") {
+      this->speciesType = new Cat();
+  }
+  else if (savedSpeciesName == "Baleine") {
+      this->speciesType = new Whale();
+  }
+  else if (savedSpeciesName == "Cheval") {
+      this->speciesType = new Horse();
+  }
+  else if (savedSpeciesName == "Souris") {
+      this->speciesType = new Mouse();
+  }
+  
   prefs.end(); // Ferme l'accès
   Serial.println("Données animal chargées depuis la mémoire !");
 }
@@ -46,6 +66,12 @@ void Animals::Save() {
   prefs.putInt("height", this->height);
   prefs.putString("behav", this->behavior);
 
+  if (this->speciesType != nullptr) {
+      prefs.putString("species", this->speciesType->getSPName());
+  } else {
+      prefs.putString("species", "Chien");
+  }
+
   prefs.end();
   Serial.println("Données animal sauvegardées !");
 }
@@ -55,6 +81,10 @@ void Animals::setName(String n) {
 }
 String Animals::getName() {
   return this->name;
+}
+
+void Animals::setSpecies(Species* s){
+  this->speciesType =s;
 }
 
 Species* Animals::getSpecies(){
@@ -82,13 +112,6 @@ void Animals::setWeight(int w) {
 }
 int Animals::getWeight() {
   return this->weight;
-}
-
-void Animals::setColor(String c) { 
-  color = c; 
-}
-String Animals::getColor() { 
-  return color; 
 }
 
 void Animals::setBehavior(String b) { 

@@ -31,7 +31,6 @@ class Screen {
     void Refresh();
 
     void DrawDashboard(String timeStr, int levelPercent, String petName);
-    void DrawMenu(String title, const char* items[], int itemCount, int selectedIndex);
     void DrawMenu(String title, const char* items[], int itemCount, int selectedIndex, int scrollOffset);
     void DrawKeyboard(String title, String currentText, int selectedKey, bool isNumeric);
     
@@ -42,7 +41,7 @@ class Screen {
     uint16_t GetColorForLevel(int level);
     void ShowMessage(String msg);
     
-    void DrawAnimalSummary(String name, int age, int weight, int height, String behavior);
+    void DrawAnimalSummary(String name, String speciesName, int age, int weight, int height, String behavior);
     void DrawHourSummary(String H1, String H2, String H3);
 };
 

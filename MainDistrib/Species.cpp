@@ -35,3 +35,10 @@ void Species::setLifespan(int spL) {
 int Species::getLifespan() {
   return this->lifespan;
 }
+
+void Species::setRationCoef(int spRC) {
+  this->rationCoefficient = spRC;
+}
+int Species::getRationCoef() {
+  return this->rationCoefficient;
+}

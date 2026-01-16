@@ -13,6 +13,11 @@
 #include "DistributionManager.h"
 #include "InputManager.h"
 #include "Animals.h"
+#include "Dog.h"
+#include "Cat.h"
+#include "Whale.h"
+#include "Horse.h"
+#include "Mouse.h"
 #include "DistribException.h"
 
 // Etats de l'application
@@ -32,6 +37,7 @@ enum AppState {
   STATE_MENU_ANIMAL,       // Le sous-menu liste
   STATE_EDIT_FIELD,        // Quand on est sur le clavier (Nom, Age, Poids...)
   STATE_SELECT_BEHAVIOR,   // Le choix Calme/Agressif
+  STATE_SELECT_SPECIES,    // Le choix de l'espece
   STATE_SHOW_SUMMARY       // La fiche technique
 };
 
@@ -57,13 +63,13 @@ class Application {
     const char* menuScheduleItems[4] = {"Heure 1", "Heure 2", "Heure 3", "Voir horaires"};
 
     // Sous-menu animal
-    const char* animalMenuItems[6] = {"Nom", "Age", "Poids", "Taille", "Comportement", "Voir Fiche"};
+    const char* animalMenuItems[7] = {"Nom", "Espece", "Age", "Poids", "Taille", "Comportement", "Voir Fiche"};
 
     // Sous-menu comportement
     const char* behaviorItems[2] = {"Calme", "Agressif"};
 
-    // Sous-menu comportement
-    const char* Items[2] = {"Calme", "Agressif"};
+    // Sous-menu Especes
+    const char* speciesItems[5] = {"Chien", "Chat", "Baleine", "Cheval", "Souris"};
     
     // Sous-menu distribution manuelle
     const char* manualMenuItems[1] = {"Lancer la dose"};
@@ -89,6 +95,7 @@ class Application {
 
     void HandleMenuAnimal(InputEvent evt);
     void HandleBehaviorSelect(InputEvent evt);
+    void HandleSpeciesSelect(InputEvent evt);
     void HandleAnimalSummary(InputEvent evt);
     void HandleHourSummary(InputEvent evt);
 

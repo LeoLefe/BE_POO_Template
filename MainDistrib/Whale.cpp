@@ -10,6 +10,6 @@ Whale::Whale() {
   sPClass = Mammal;
   diet = Plankton;
   lifespan = 90;
-  rationCoefficient = 100;
+  rationCoefficient = 5;
 }
 Whale::~Whale() {}

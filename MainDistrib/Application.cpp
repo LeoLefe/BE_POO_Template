@@ -70,6 +70,10 @@ void Application::Run() {
     case STATE_SELECT_BEHAVIOR:
       HandleBehaviorSelect(evt);
       break;
+    
+    case STATE_SELECT_SPECIES :
+      HandleSpeciesSelect(evt);
+      break;
 
     case STATE_SHOW_SUMMARY:
       HandleAnimalSummary(evt);
@@ -87,7 +91,7 @@ void Application::Run() {
   }
 
   // Gestion Automatique (Horaires)
-  distributor.CheckAutoFeed(currentTime, &motor);
+  distributor.CheckAutoFeed(currentTime, &motor, pets.getSpecies()->getRationCoef());
 }
 
 // --- Logique des États ---
@@ -99,6 +103,78 @@ void Application::HandleDashboard(InputEvent evt) {
     menuIndex = 0; // Reset sélection
     screen.DrawMenu("MENU PRINCIPAL", mainMenuItems, 3, menuIndex, 0);
   }
+}
+
+void Application::HandleKeyboard(InputEvent evt, bool isNumeric) {
+  if (evt == EVT_NONE) return;
+
+  int maxKeys = screen.GetKeyCount(isNumeric);
+
+  if (evt == EVT_DOWN) {
+    keyboardIndex++;
+    // Si on dépasse la fin, on revient au début (boucle)
+    if (keyboardIndex >= maxKeys) keyboardIndex = 0;
+  }
+  // BP3 (UP) -> Va vers la gauche (Précédent)
+  else if (evt == EVT_UP) {
+    keyboardIndex--;
+    // Si on est avant le début, on va à la fin
+    if (keyboardIndex < 0) keyboardIndex = maxKeys - 1;
+  }
+  else if (evt == EVT_ENTER) {
+    char key = screen.GetKeyChar(keyboardIndex, isNumeric);
+    
+    if (key == '<') { // Effacer
+      if (tempInputString.length() > 0) {
+        tempInputString.remove(tempInputString.length() - 1);
+      }
+    }
+    else if (key == '>') { // OK Valider
+      
+      // On regarde ce qu'on était en train d'éditer
+      switch (menuIndex) {
+        case 0:
+          pets.setName(tempInputString);
+          break;
+        case 2:
+          pets.setAge(tempInputString.toInt());
+          break;
+        case 3:
+          pets.setWeight(tempInputString.toInt());
+          break;
+        case 4:
+          pets.setHeight(tempInputString.toInt());
+          break;
+      }
+
+      // Sauvegarde en mémoire ROM
+      pets.Save();
+      
+      // Retour menu
+      currentState = STATE_MENU_ANIMAL;
+      screen.DrawMenu("MENU ANIMAL", animalMenuItems, 7, menuIndex, menuScrollOffset);
+      return;
+    }
+    else { // Lettre normale
+      if (tempInputString.length() < 10) { // Limite taille
+        tempInputString += key;
+      }
+    }
+  }
+  else if (evt == EVT_BACK) {
+    // Annuler saisie
+    currentState = STATE_MENU_ANIMAL;
+    screen.DrawMenu("MENU ANIMAL", animalMenuItems, 7, menuIndex, menuScrollOffset);
+    return;
+  }
+
+  // Redessiner clavier
+  String titre = "Valeur";
+  if (menuIndex == 0) titre = "Nom";
+  else if (menuIndex == 2) titre = "Age";
+  else if (menuIndex == 3) titre = "Poids";
+  else if (menuIndex == 4) titre = "Taille";
+  screen.DrawKeyboard(titre, tempInputString, keyboardIndex, isNumeric);
 }
 
 void Application::HandleMenuMain(InputEvent evt) {
@@ -131,7 +207,7 @@ void Application::HandleMenuMain(InputEvent evt) {
         currentState = STATE_MENU_ANIMAL;
         menuIndex = 0;
         tempInputString = ""; // Vide le champ
-        screen.DrawMenu("MENU ANIMAL", animalMenuItems, 6, menuIndex, 0);
+        screen.DrawMenu("MENU ANIMAL", animalMenuItems, 7, menuIndex, 0);
         return; 
 
       case 2: // Distribution manuelle
@@ -273,12 +349,12 @@ void Application::HandleEditMealTime(InputEvent evt, bool isNumeric, int index) 
 }
 
 void Application::HandleMenuAnimal(InputEvent evt) {
-  int itemCount = 6; // Nombre d'items dans le menu Animal
+  int itemCount = 7; // Nombre d'items dans le menu Animal
   int maxVisible = 4;
 
   if (evt == EVT_DOWN) {
     menuIndex++; 
-    if (menuIndex > 5) {
+    if (menuIndex > 6) {
       menuIndex = 0;
       menuScrollOffset = 0;
     }
@@ -317,26 +393,31 @@ void Application::HandleMenuAnimal(InputEvent evt) {
         currentState = STATE_EDIT_FIELD;
         screen.DrawKeyboard("Nom de l'animal", pets.getName(), 0, false); // false = Alpha
         break;
-      case 1: // Age
+      case 1: // Especes 
+        currentState = STATE_SELECT_SPECIES;
+        menuIndex = 0;
+        screen.DrawMenu("Choix Especes", speciesItems, 5, menuIndex, 0);
+        break;
+      case 2: // Age
         currentState = STATE_EDIT_FIELD;
         screen.DrawKeyboard("Age", String(pets.getAge()), 0, true); // true = Num
         break;
-      case 2: // Poids
+      case 3: // Poids
         currentState = STATE_EDIT_FIELD;
         screen.DrawKeyboard("Poids (kg)", String(pets.getWeight()), 0, true);
         break;
-      case 3: // Taille
+      case 4: // Taille
         currentState = STATE_EDIT_FIELD;
         screen.DrawKeyboard("Taille (cm)", String(pets.getHeight()), 0, true);
         break;
-      case 4: // Comportement (Pas de clavier, mais un autre menu)
+      case 5: // Comportement
         currentState = STATE_SELECT_BEHAVIOR;
         menuIndex = 0;
         screen.DrawMenu("Comportement", behaviorItems, 2, 0, 0);
         break;
-      case 5: // Voir Fiche
+      case 6: // Voir Fiche
         currentState = STATE_SHOW_SUMMARY;
-        screen.DrawAnimalSummary(pets.getName(), pets.getAge(), pets.getWeight(), pets.getHeight(), pets.getBehavior());
+        screen.DrawAnimalSummary(pets.getName(), pets.getSpecies()->getSPName(), pets.getAge(), pets.getWeight(), pets.getHeight(), pets.getBehavior());
         break;
     }
     return;
@@ -345,78 +426,6 @@ void Application::HandleMenuAnimal(InputEvent evt) {
   if (currentState == STATE_MENU_ANIMAL && evt != EVT_NONE) {
     screen.DrawMenu("MENU ANIMAL", animalMenuItems, itemCount, menuIndex, menuScrollOffset);
   }
-}
-
-void Application::HandleKeyboard(InputEvent evt, bool isNumeric) {
-  if (evt == EVT_NONE) return;
-
-  int maxKeys = screen.GetKeyCount(isNumeric);
-
-  if (evt == EVT_DOWN) {
-    keyboardIndex++;
-    // Si on dépasse la fin, on revient au début (boucle)
-    if (keyboardIndex >= maxKeys) keyboardIndex = 0;
-  }
-  // BP3 (UP) -> Va vers la gauche (Précédent)
-  else if (evt == EVT_UP) {
-    keyboardIndex--;
-    // Si on est avant le début, on va à la fin
-    if (keyboardIndex < 0) keyboardIndex = maxKeys - 1;
-  }
-  else if (evt == EVT_ENTER) {
-    char key = screen.GetKeyChar(keyboardIndex, isNumeric);
-    
-    if (key == '<') { // Effacer
-      if (tempInputString.length() > 0) {
-        tempInputString.remove(tempInputString.length() - 1);
-      }
-    }
-    else if (key == '>') { // OK Valider
-      
-      // On regarde ce qu'on était en train d'éditer
-      switch (menuIndex) {
-        case 0:
-          pets.setName(tempInputString);
-          break;
-        case 1:
-          pets.setAge(tempInputString.toInt());
-          break;
-        case 2:
-          pets.setWeight(tempInputString.toInt());
-          break;
-        case 3:
-          pets.setHeight(tempInputString.toInt());
-          break;
-      }
-
-      // Sauvegarde en mémoire ROM
-      pets.Save();
-      
-      // Retour menu
-      currentState = STATE_MENU_ANIMAL;
-      screen.DrawMenu("MENU ANIMAL", animalMenuItems, 6, menuIndex, 0);
-      return;
-    }
-    else { // Lettre normale
-      if (tempInputString.length() < 10) { // Limite taille
-        tempInputString += key;
-      }
-    }
-  }
-  else if (evt == EVT_BACK) {
-    // Annuler saisie
-    currentState = STATE_MENU_ANIMAL;
-    screen.DrawMenu("MENU ANIMAL", animalMenuItems, 6, menuIndex, 0);
-    return;
-  }
-
-  // Redessiner clavier
-  String titre = "Valeur";
-  if (menuIndex == 0) titre = "Nom";
-  else if (menuIndex == 1) titre = "Age";
-  else if (menuIndex == 2) titre = "Poids";
-  else if (menuIndex == 3) titre = "Taille";
-  screen.DrawKeyboard(titre, tempInputString, keyboardIndex, isNumeric);
 }
 
 void Application::HandleBehaviorSelect(InputEvent evt) {
@@ -436,14 +445,14 @@ void Application::HandleBehaviorSelect(InputEvent evt) {
 
     // Retour
     currentState = STATE_MENU_ANIMAL;
-    menuIndex = 4; // On revient sur la ligne "Comportement"
-    screen.DrawMenu("MENU ANIMAL", animalMenuItems, 6, menuIndex, 1);
+    menuIndex = 5; // On revient sur la ligne "Comportement"
+    screen.DrawMenu("MENU ANIMAL", animalMenuItems, 7, menuIndex, menuScrollOffset);
     return;
   }
   else if (evt == EVT_BACK) {
     currentState = STATE_MENU_ANIMAL;
-    menuIndex = 4;
-    screen.DrawMenu("MENU ANIMAL", animalMenuItems, 6, menuIndex, 1);
+    menuIndex = 5;
+    screen.DrawMenu("MENU ANIMAL", animalMenuItems, 7, menuIndex, menuScrollOffset);
     return;
   }
 
@@ -452,10 +461,79 @@ void Application::HandleBehaviorSelect(InputEvent evt) {
   }
 }
 
+void Application::HandleSpeciesSelect(InputEvent evt){
+  int itemCount = 5; // Nombre d'items dans le menu Espece
+  int maxVisible = 4;
+
+  if (evt == EVT_DOWN) {
+    menuIndex++; 
+    if (menuIndex > 4) {
+      menuIndex = 0;
+      menuScrollOffset = 0;
+    }
+    else if (menuIndex >= menuScrollOffset + maxVisible) {
+      menuScrollOffset++; // On décale la fenêtre vers le bas
+    }
+  }
+  else if (evt == EVT_UP) {
+    menuIndex--; 
+    if (menuIndex < 0) {
+      menuIndex = itemCount - 1; // Dernier item
+      menuScrollOffset = itemCount - maxVisible; 
+      if (menuScrollOffset < 0) {
+        menuScrollOffset = 0; // Sécurité
+      }
+    }
+    // Si le curseur dépasse le haut de la fenêtre visible
+    else if (menuIndex < menuScrollOffset) {
+      menuScrollOffset--; // On décale la fenêtre vers le haut
+    }
+  }
+  else if (evt == EVT_BACK) {
+    // Retour au menu principal
+    currentState = STATE_MENU_MAIN;
+    menuIndex = 1; // On se remet sur "Espece"
+    screen.DrawMenu("MENU ANIMAL", animalMenuItems, 7, menuIndex, 0);;
+    return;
+  }
+  else if (evt == EVT_ENTER) {
+    // Choix de l'élément à modifier
+    switch (menuIndex) {
+      case 0: // Chien
+        pets.setSpecies(new Dog());
+        break;
+      case 1: // Chat
+        pets.setSpecies(new Cat());
+        break;
+      case 2: // Baleine
+        pets.setSpecies(new Whale());
+        break;
+      case 3: // Cheval
+        pets.setSpecies(new Horse());
+        break;
+      case 4: // Souris
+        pets.setSpecies(new Mouse()); 
+        break;
+    }
+    // Sauvegarde en mémoire ROM
+    pets.Save();
+
+    // Retour
+    currentState = STATE_MENU_ANIMAL;
+    menuIndex = 1; // On revient sur la ligne "Espece"
+    screen.DrawMenu("MENU ANIMAL", animalMenuItems, 7, menuIndex, 0);
+    return;
+  }
+
+  if (currentState == STATE_SELECT_SPECIES && evt != EVT_NONE) {
+    screen.DrawMenu("Choix Especes", speciesItems, 5, menuIndex, menuScrollOffset);
+  }
+}
+
 void Application::HandleAnimalSummary(InputEvent evt) {
   if (evt == EVT_BACK || evt == EVT_ENTER) {
     currentState = STATE_MENU_ANIMAL;
-    screen.DrawMenu("MENU ANIMAL", animalMenuItems, 6, menuIndex, 2);
+    screen.DrawMenu("MENU ANIMAL", animalMenuItems, 7, menuIndex, 3);
   }
 }
 
@@ -473,7 +551,7 @@ void Application::HandleManualFeed(InputEvent evt) {
     screen.ShowMessage("Distribution en cours...");
     
     // Action Moteur (cette fonction est bloquante quelques secondes)
-    distributor.ForceFeed(&motor);
+    distributor.ForceFeed(&motor, pets.getSpecies()->getRationCoef());
     
     // Feedback de fin
     Serial.println("Termine !");
