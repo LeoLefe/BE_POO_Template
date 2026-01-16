@@ -15,6 +15,7 @@ DistributionManager::DistributionManager() {
 DistributionManager::~DistributionManager() {}
 
 void DistributionManager::Init() {
+  screen.Init();
   Preferences prefs;
   prefs.begin("distrib_cfg", true); // Lecture seule
 
@@ -55,8 +56,7 @@ void DistributionManager::setMealTime(int index, String timeStr) {
   mealTimes[index] = timeStr;
 }
 
-void DistributionManager::CheckAutoFeed(String currentTime, Motor* motor, int coeff) {
-  
+void DistributionManager::CheckAutoFeed(String currentTime, Motor* motor, int coeff, int level) {
   int currentMinute = currentTime.substring(3, 5).toInt();  // Extraction de la minute actuelle pour le flag lastFedMinute
 
   if (currentMinute == lastFedMinute) return; // Si on a déjà nourri cette minute, on ne fait rien
@@ -64,6 +64,12 @@ void DistributionManager::CheckAutoFeed(String currentTime, Motor* motor, int co
   bool feedNow = false; // Vérification de tous les horaires
   for (int i = 0; i < MAX_MEALS; i++) {
     if (currentTime == mealTimes[i]) {
+      
+      if (level < 10)
+      {
+        throw DistribException(3, "Bac à croquettes vide !");  // Exception si les croquettes sont vides au moment de la distribution
+      }
+
       feedNow = true;
       break;
     }
@@ -71,8 +77,10 @@ void DistributionManager::CheckAutoFeed(String currentTime, Motor* motor, int co
 
   if (feedNow) {
     Serial.println("Distribution Automatique !");
+    screen.ShowMessage("Distribution en cours...");
     motor->Start((1.0*coeff), 800); // 1 tour
     lastFedMinute = currentMinute; // Marque la minute comme traitée
+    screen.Refresh();
   }
 }
 

@@ -9,12 +9,16 @@
 #include <Arduino.h>
 #include <Preferences.h>
 #include "Motor.h"
+#include "Screen.h"
+#include "DistribException.h"
 
 class DistributionManager {
   private:
     static const int MAX_MEALS = 3; // Maximum 3 repas par jour
     String mealTimes[MAX_MEALS];    // Tableau des heures de repas "HH:MM:00"
     int lastFedMinute = -1;         // Flag pour éviter de redistribuer des croquettes trop rapidement
+
+    Screen screen;
 
   public:
     DistributionManager();
@@ -29,8 +33,8 @@ class DistributionManager {
     String getMealTime(int index);
     void setMealTime(int index, String timeStr);
 
-    void CheckAutoFeed(String currentTime, Motor* motor, int coeff);
-    void ForceFeed(Motor* motor, int coeff);
+    void CheckAutoFeed(String currentTime, Motor* motor, int coeff, int level); // Permet de distribuer des croquettes aux heures de repas prévues s'il y a assez de croquettes
+    void ForceFeed(Motor* motor, int coeff); // Permet de distribuer des croquettes manuellement
 };
 
 #endif

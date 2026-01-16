@@ -1,3 +1,4 @@
+#include "esp32-hal.h"
 /*********************************************************************
  * @file  Apllication.cpp
  * @author <Léo Lefebvre & Estelle Coudon>
@@ -90,8 +91,25 @@ void Application::Run() {
       break;
   }
 
-  // Gestion Automatique de la distribution des croquettes (Horaires)
-  distributor.CheckAutoFeed(currentTime, &motor, pets.getSpecies()->getRationCoef());
+  try
+  {
+    distributor.CheckAutoFeed(currentTime, &motor, pets.getSpecies()->getRationCoef(), sensor.GetLevelPercent()); // Gestion Automatique de la distribution des croquettes
+  }
+  catch (DistribException ex)
+  {
+    switch (ex.exType)
+    {
+      case 3:
+        screen.ShowMessage(ex.exMessage);
+        delay(1000);
+        tempInputString = "";
+        screen.Refresh();
+        break;
+      
+      default:
+        break;
+    }
+  }
 }
 
 // --- Logique des États ---
@@ -327,12 +345,12 @@ void Application::HandleEditMealTime(InputEvent evt, bool isNumeric, int index) 
           } 
           else
           {
-            throw DistribException(2, "Heure Invalide !");
+            throw DistribException(2, "Heure Invalide !");  // Exception si l'heure est invalide
           }
         }
         else
         {
-          throw DistribException(1, "Format HHMM SVP");
+          throw DistribException(1, "Format HHMM SVP"); // Exception si l'heure n'est pas au bon format
         }
       }
       catch (DistribException ex)
@@ -566,23 +584,47 @@ void Application::HandleHourSummary(InputEvent evt) {
 
 // Gestion de la distribution manuelle
 void Application::HandleManualFeed(InputEvent evt) {
-  if (evt == EVT_ENTER) { // Si le bouton entré est appuyé, la dose de croquette est distribuée
-    Serial.println("Distribution en cours...");
-    screen.ShowMessage("Distribution en cours...");
-    
-    // Action Moteur (cette fonction est bloquante quelques secondes)
-    distributor.ForceFeed(&motor, pets.getSpecies()->getRationCoef());
-    
-    // Fin de la distribution
-    Serial.println("Termine !");
-    screen.ShowMessage("Termine !");
-    
-    // On réaffiche le menu de distribution
-    currentState = STATE_MANUAL_FEED;
-    screen.DrawMenu("DISTRIBUTION", manualMenuItems, 1, 0, 0);
+  try
+  {
+    if (evt == EVT_ENTER) { // Si le bouton entré est appuyé, la dose de croquette est distribuée
+      if (sensor.GetLevelPercent() < 10)
+      {
+        throw DistribException(3, "Bac à croquettes vide !");  // Exception si les croquettes sont vides au moment de la distribution
+      }
+
+      Serial.println("Distribution en cours...");
+      screen.ShowMessage("Distribution en cours...");
+      
+      // Action Moteur (cette fonction est bloquante quelques secondes)
+      distributor.ForceFeed(&motor, pets.getSpecies()->getRationCoef());
+      
+      // Fin de la distribution
+      Serial.println("Termine !");
+      screen.ShowMessage("Termine !");
+      delay(1000);
+      
+      // On réaffiche le menu de distribution
+      currentState = STATE_MANUAL_FEED;
+      screen.DrawMenu("DISTRIBUTION", manualMenuItems, 1, 0, 0);
+    }
+    else if (evt == EVT_BACK) { // Si le bouton retour est appuyé, la dose n'est pas distribuée et on revient au menu principal
+      currentState = STATE_MENU_MAIN;
+      screen.DrawMenu("MENU PRINCIPAL", mainMenuItems, 3, menuIndex, 0);
+    }
   }
-  else if (evt == EVT_BACK) { // Si le bouton retour est appuyé, la dose n'est pas distribuée et on revient au menu principal
-    currentState = STATE_MENU_MAIN;
-    screen.DrawMenu("MENU PRINCIPAL", mainMenuItems, 3, menuIndex, 0);
+  catch (DistribException ex)
+  {
+    switch (ex.exType)
+    {
+      case 3:
+        screen.ShowMessage(ex.exMessage);
+        delay(1000);
+        tempInputString = "";
+        screen.Refresh();
+        break;
+      
+      default:
+        break;
+    }
   }
 }

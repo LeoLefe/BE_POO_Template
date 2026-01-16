@@ -12,7 +12,8 @@ enum ExceptionType
 {
   Unknown = 0,
   InvalidFormat = 1,  // Format de donnée invalide
-  InvalidHour = 2     // Heure impossible
+  InvalidHour = 2,    // Heure impossible
+  NotEnoughKiddle = 3 // Plus assez de croquettes
 };
 
 class DistribException {
