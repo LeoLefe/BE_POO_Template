@@ -22,6 +22,7 @@
 
 // Etats de l'application
 enum AppState {
+  //Etat pour l'écran d'accueil
   STATE_DASHBOARD,
 
   // Etats pour le menu principal
@@ -31,12 +32,12 @@ enum AppState {
   // Etats pour le menu Horaires
   STATE_MENU_SCHEDULE,     // Menu liste des horaires
   STATE_EDIT_MEAL_TIME,    // Clavier pour rentrer l'heure
-  STATE_SHOW_HOURS,
+  STATE_SHOW_HOURS,        // La fiche d'heures des repas
 
   // Etats pour le menu Animal
-  STATE_MENU_ANIMAL,       // Le sous-menu liste
-  STATE_EDIT_FIELD,        // Quand on est sur le clavier (Nom, Age, Poids...)
-  STATE_SELECT_BEHAVIOR,   // Le choix Calme/Agressif
+  STATE_MENU_ANIMAL,       // Le sous-menu avec la liste des items
+  STATE_EDIT_FIELD,        // Clavier pour modifier les items (Nom, Age, Poids...)
+  STATE_SELECT_BEHAVIOR,   // Le choix du comportement
   STATE_SELECT_SPECIES,    // Le choix de l'espece
   STATE_SHOW_SUMMARY       // La fiche technique
 };
@@ -51,15 +52,17 @@ class Application {
     InputManager inputs;
     Animals pets;
 
-    // Gestion de l'état
+    // Gestion de l'état de l'application
     AppState currentState;
 
-    // Navigation Menu
+    // Navigation dans un menu
     int menuIndex;
     int menuScrollOffset;
+
+    // Menu principal
     const char* mainMenuItems[3] = {"Horaires", "Animal", "Distrib Manuel"};
 
-    // Sous-menu horaires (Buffers pour l'affichage dynamique du menu)
+    // Sous-menu horaires
     const char* menuScheduleItems[4] = {"Heure 1", "Heure 2", "Heure 3", "Voir horaires"};
 
     // Sous-menu animal
@@ -75,18 +78,22 @@ class Application {
     const char* manualMenuItems[1] = {"Lancer la dose"};
     
     // Navigation Clavier
-    String tempInputString; // Ce qu'on tape
-    int keyboardIndex;
+    String tempInputString; // Ce qu'on entre avec les touches
+    int keyboardIndex;      // Curseur clavier
 
     unsigned long lastUIUpdate;
 
   public:
     Application();
     ~Application();
-    void Init();
-    void Run();
-    // Fonctions de logique interne
+
+    void Init();  // Initialisation de l'application et de l'écran d'accueil
+    void Run();   // Boucle de gestion de l'affichage des menus en fonction de l'état de l'application
+
+    // Fonctions de logique interne des menus
     void HandleDashboard(InputEvent evt);
+    void HandleKeyboard(InputEvent evt, bool isNumeric);
+
     void HandleMenuMain(InputEvent evt);
 
     void HandleMenuSchedule(InputEvent evt);
@@ -99,7 +106,6 @@ class Application {
     void HandleAnimalSummary(InputEvent evt);
     void HandleHourSummary(InputEvent evt);
 
-    void HandleKeyboard(InputEvent evt, bool isNumeric);
 };
 
 #endif

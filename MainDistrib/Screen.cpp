@@ -19,7 +19,7 @@ Screen::~Screen() {}
 
 void Screen::Init() {
   tft.init();
-  tft.setRotation(0); // Adapter selon montage (0-3)
+  tft.setRotation(0);
   Refresh();
   
   centerX = tft.width() / 2;
@@ -45,7 +45,7 @@ uint16_t Screen::GetColorForLevel(int level) {
 }
 
 void Screen::DrawDashboard(String timeStr, int levelPercent, String petName) {
-  //Affiche du niveau par une jauge
+  // Affichage du niveau par une jauge
   int angleRempli = (levelPercent * ARC_FULL_SPAN) / 100;
   int currentFillEnd = ARC_START_ANGLE + angleRempli;
   if (currentFillEnd >= 360) 
@@ -57,7 +57,7 @@ void Screen::DrawDashboard(String timeStr, int levelPercent, String petName) {
       centerX, centerY,
       ARC_RADIUS_OUTER, ARC_RADIUS_INNER,
       currentFillEnd, ARC_END_ANGLE,      // De l'angle calculé à 60°
-      TFT_DARKGREY,                       // Couleur "vide"
+      TFT_DARKGREY,                       // Couleur de la partie vide
       TFT_BLACK,
       true
     );
@@ -70,24 +70,24 @@ void Screen::DrawDashboard(String timeStr, int levelPercent, String petName) {
       ARC_RADIUS_OUTER, ARC_RADIUS_INNER, // Rayons
       ARC_START_ANGLE, currentFillEnd,    // De 300° à l'angle calculé
       GetColorForLevel(levelPercent),     // Couleur active
-      TFT_BLACK,                          // Couleur de fond (pour l'anti-aliasing)
+      TFT_BLACK,                          // Couleur de fond
       true                                // Bords arrondis
     );
   }
   
-  // Affichage Heure
+  // Affichage de l'heure
   tft.setFreeFont(&FreeSansBold18pt7b);
   tft.setTextSize(1);
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.drawString(timeStr, centerX, centerY - 20);
 
-  // Affichage niveau en texte
+  // Affichage du niveau en pourcentage
   tft.setFreeFont(&FreeSansBold12pt7b);
   String levelStr = "  " + String(levelPercent) + " %  ";
   tft.setTextColor(GetColorForLevel(levelPercent), TFT_BLACK);
   tft.drawString(levelStr, centerX, 35);
 
-  // Affichage nom Animal
+  // Affichage du nom de l'animal
   tft.setFreeFont(&FreeSansBold9pt7b);
   tft.setTextColor(TFT_CYAN, TFT_BLACK);
   tft.drawString(petName, centerX, centerY + 60);
@@ -98,48 +98,42 @@ void Screen::DrawDashboard(String timeStr, int levelPercent, String petName) {
   tft.drawString("Appuyez pour MENU", centerX, 220);
 }
 
-// Menu statique
-
-
-// Menu défillant
 void Screen::DrawMenu(String title, const char* items[], int itemCount, int selectedIndex, int scrollOffset) {
   Refresh();
 
   // Titre
   tft.setTextColor(TFT_ORANGE, TFT_BLACK);
   tft.setFreeFont(&FreeSansBold9pt7b);
-  tft.setTextDatum(TC_DATUM); // Top Center
+  tft.setTextDatum(TC_DATUM); // Centre haut
   tft.drawString(title, centerX, 50);
 
   // Liste
   int startY = 80;
   int stepY = 30;
-  int maxVisible = 4; // Nombre d'items affichés max
+  int maxVisible = 4; // Nombre d'items maximum affichés en même temps sur l'écran
 
   tft.setFreeFont(&FreeSansBold9pt7b);
   tft.setTextDatum(MC_DATUM);
 
   for (int i = 0; i < maxVisible; i++) {
     int itemIndex = scrollOffset + i;
-    // Sécurité si on a moins de 4 items au total
-    if (itemIndex >= itemCount) break;
+    if (itemIndex >= itemCount)
+      break;  // Sécurité si on a moins de 4 items au total
 
     int yPos = startY + (i * stepY);
     
     if (itemIndex == selectedIndex) {
-      // Élément sélectionné : Fond Blanc, Texte Noir
-      tft.fillRoundRect(40, yPos - 12, 160, 24, 5, TFT_WHITE);
+      tft.fillRoundRect(40, yPos - 12, 160, 24, 5, TFT_WHITE);  // Élément sélectionné : Fond Blanc, Texte Noir
       tft.setTextColor(TFT_BLACK, TFT_WHITE);
     }
     else {
-      // Normal : Fond Noir, Texte Blanc
-      tft.setTextColor(TFT_WHITE, TFT_BLACK);
+      tft.setTextColor(TFT_WHITE, TFT_BLACK); // Élément non sélectionné : Fond Noir, Texte Blanc
     }
     tft.drawString(items[itemIndex], centerX, yPos);
   }
 
-  // --- 2. Gestion des FLÈCHES (à gauche) ---
-  int arrowX = 25; // Position X des flèches (à gauche)
+  // Gestion des flèches de scroll
+  int arrowX = 25; // Position en X des flèches
   
   // Flèche HAUT
   if (scrollOffset > 0) {
@@ -148,8 +142,6 @@ void Screen::DrawMenu(String title, const char* items[], int itemCount, int sele
 
   // Flèche BAS
   if ((scrollOffset + maxVisible) < itemCount) {
-    //int arrowY = startY + (maxVisible * stepY) - 10; 
-    //tft.fillTriangle(arrowX, arrowY + 10, arrowX - 5, arrowY, arrowX + 5, arrowY, TFT_DARKGREY); // Triangle pointant vers le bas 
     tft.fillTriangle(arrowX, 160, arrowX - 5, 150, arrowX + 5, 150, TFT_DARKGREY); // Triangle pointant vers le bas 
   }
 }
@@ -157,7 +149,7 @@ void Screen::DrawMenu(String title, const char* items[], int itemCount, int sele
 void Screen::DrawKeyboard(String title, String currentText, int selectedKey, bool isNumeric) {
   tft.fillScreen(TFT_BLACK);
 
-  // 1. Titre et Champ de saisie
+  // Titre et Champ de saisie
   tft.setTextColor(TFT_ORANGE, TFT_BLACK);
   tft.setFreeFont(&FreeSansBold9pt7b);
   tft.setTextDatum(TC_DATUM);
@@ -170,17 +162,17 @@ void Screen::DrawKeyboard(String title, String currentText, int selectedKey, boo
   tft.setTextDatum(MC_DATUM);
   tft.drawString(currentText, centerX, 58);
 
-  // 2. Grille de touches
+  // Grille de touches
   int keySize = 26; // Carré de 30px
   int gap = 4;
   int cols = 6; // 6 colonnes
 
-  int totalKeys = isNumeric ? 12 : 28;
-  const char* map = isNumeric ? KEYMAP_NUM : KEYMAP_ALPHA;
+  int totalKeys = isNumeric ? 12 : 28; // Si isNumeric == true => totalkeys = 12, sinon => totalkeys = 28
+  const char* map = isNumeric ? KEYMAP_NUM : KEYMAP_ALPHA;  // De même pour map
 
   // Calcul pour centrer le bloc entier horizontalement
   int gridWidth = cols * keySize + (cols - 1) * gap;
-  int startX = (tft.width() - gridWidth) / 2; // = (240 - 176)/2 = 32
+  int startX = (tft.width() - gridWidth) / 2;
   int startY = 80;
 
   for (int i = 0; i < totalKeys; i++) {
@@ -190,14 +182,12 @@ void Screen::DrawKeyboard(String title, String currentText, int selectedKey, boo
     int x = startX + col * (keySize + gap);
     int y = startY + row * (keySize + gap);
 
-    // --- LOGIQUE DE CENTRAGE DE LA DERNIÈRE LIGNE ---
-    // Si nous sommes sur la dernière ligne (row) et qu'elle n'est pas pleine
-    int keysOnLastRow = totalKeys % cols; 
+    // Gestion de la dernière ligne
+    int keysOnLastRow = totalKeys % cols; // Si keysOnLastRow == 0, la ligne est pleine (ex: 12 touches / 6 cols = 0 reste), pas de décalage.
     int totalRows = (totalKeys + cols - 1) / cols;
-    // Si keysOnLastRow == 0, la ligne est pleine (ex: 12 touches / 6 cols = 0 reste), pas de décalage.
-    // Si on est sur la dernière ligne (row == totalRows - 1) et qu'il y a un reste
+    
     if (keysOnLastRow > 0 && row == (totalRows - 1)) {
-        // Calcul du décalage pour centrer ces touches
+        // Calcul du décalage pour centrer les touches de la dernière ligne
         int widthOfLastRow = keysOnLastRow * keySize + (keysOnLastRow - 1) * gap;
         int emptySpace = gridWidth - widthOfLastRow;
         x += emptySpace / 2; // On décale vers la droite de la moitié de l'espace vide
@@ -215,9 +205,12 @@ void Screen::DrawKeyboard(String title, String currentText, int selectedKey, boo
     tft.setFreeFont(&FreeSansBold9pt7b);
     char c = map[i];
     
-    if (c == '<') tft.drawString("<-", x + keySize/2, y + keySize/2-2);
-    else if (c == '>') tft.drawString("OK", x + keySize/2, y + keySize/2-2);
-    else tft.drawChar(c, x + keySize/2 - 6, y + keySize/2+6);
+    if (c == '<')
+      tft.drawString("<-", x + keySize/2, y + keySize/2-2);
+    else if (c == '>')
+      tft.drawString("OK", x + keySize/2, y + keySize/2-2);
+    else
+      tft.drawChar(c, x + keySize/2 - 6, y + keySize/2+6);
   }
 }
 
@@ -237,12 +230,11 @@ void Screen::ShowMessage(String msg) {
   tft.setTextColor(TFT_ORANGE, TFT_BLACK);
   tft.setFreeFont(&FreeSansBold9pt7b);
   tft.drawString(msg, centerX, centerY);
-  //delay(2000);
-  //Refresh();
 }
 
 void Screen::DrawAnimalSummary(String name, String speciesName, int age, int weight, int height, String behavior) {
   Refresh();
+
   // Titre
   tft.setTextColor(TFT_ORANGE, TFT_BLACK);
   tft.setFreeFont(&FreeSansBold9pt7b);
@@ -251,12 +243,13 @@ void Screen::DrawAnimalSummary(String name, String speciesName, int age, int wei
 
   tft.setFreeFont(&FreeSansBold9pt7b);
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
-  tft.setTextDatum(TL_DATUM); // Top Left pour aligner le texte
+  tft.setTextDatum(TL_DATUM); // Bord gauche pour aligner le texte
   
   int startX = 20;
   int startY = 60;
   int gap = 28;
 
+  // Liste des informations
   tft.drawString("Nom : " + name + " -> " + speciesName, startX, startY);
   tft.drawString("Age : " + String(age) + " ans", startX, startY + gap);
   tft.drawString("Poids : " + String(weight) + " kg", startX, startY + gap*2);
@@ -267,6 +260,7 @@ void Screen::DrawAnimalSummary(String name, String speciesName, int age, int wei
 
 void Screen::DrawHourSummary(String H1, String H2, String H3) {
   Refresh();
+
   // Titre
   tft.setTextColor(TFT_ORANGE, TFT_BLACK);
   tft.setFreeFont(&FreeSansBold9pt7b);
@@ -275,12 +269,13 @@ void Screen::DrawHourSummary(String H1, String H2, String H3) {
 
   tft.setFreeFont(&FreeSansBold9pt7b);
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
-  tft.setTextDatum(TL_DATUM); // Top Left pour aligner le texte
+  tft.setTextDatum(TL_DATUM);
   
   int startX = 20;
   int startY = 60;
   int gap = 28;
 
+  // Liste des heures de repas
   tft.drawString("Heure 1 : " + H1, startX, startY);
   tft.drawString("Heure 2 : " + H2, startX, startY + gap);
   tft.drawString("Heure 3 : " + H3, startX, startY + gap*2);

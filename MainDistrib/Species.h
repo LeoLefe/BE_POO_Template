@@ -27,11 +27,11 @@ enum SpeciesDiet {
 
 class Species {
   protected:
-    String speciesName;
-    SpeciesClass sPClass;
-    SpeciesDiet diet;
-    int lifespan;// type de croquette différent en focntion de l'âge (chaton, vieux chat...)
-    int rationCoefficient;
+    String speciesName;     // Nom de l'espèce
+    SpeciesClass sPClass;   // Classe de l'espèce
+    SpeciesDiet diet;       // Régime de l'espèce
+    int lifespan;           // Durée de vie de l'espèce
+    int rationCoefficient;  // Facteur correspondant à la quantité de nourriture
 
   public:
     Species();
@@ -48,12 +48,11 @@ class Species {
     
     void setLifespan(int spL);
     int getLifespan();
- 
+
     void setRationCoef(int spRC);
     int getRationCoef();
- 
     
-    virtual String getSound() = 0;
+    virtual String getSound() = 0;  // Méthode abstraite permettant de renseigner le cri de chaque espèce
 };
 
 #endif

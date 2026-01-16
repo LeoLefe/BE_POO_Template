@@ -20,9 +20,9 @@ class NetworkApp {
     NetworkApp();
     ~NetworkApp();
 
-    void Init();     
-    void Update();   
-    String GetTimeString();
+    void Init();    // Etablissement de la connexion WIFI
+    void Update();  // Actualisation de la connexion WIFI en cas de coupure
+    String GetTimeString(); // Permet de récupérer l'heure locale convertie en string
 };
 
 #endif

@@ -17,7 +17,7 @@ DistributionManager::DistributionManager() {
 DistributionManager::~DistributionManager() {}
 
 void DistributionManager::Init() {
-  Preferences prefs; // Ou dans le .h ???
+  Preferences prefs;
   prefs.begin("distrib_cfg", true); // Lecture seule
 
   mealCount = prefs.getInt("count", 2);
@@ -49,26 +49,27 @@ void DistributionManager::Save() {
 }
 
 String DistributionManager::getMealTime(int index) {
-  if (index < 0 || index >= MAX_MEALS) return "00:00:00";
-  // On retourne juste HH:MM pour l'affichage (sans les secondes)
-  return mealTimes[index].substring(0, 5); 
+  if (index < 0 || index >= MAX_MEALS)
+    return "00:00:00";
+  
+  return mealTimes[index].substring(0, 5); // On retourne juste HH:MM pour l'affichage (sans les secondes)
 }
 void DistributionManager::setMealTime(int index, String timeStr) {
-  if (index < 0 || index >= MAX_MEALS) return;
-  // On s'assure que le format est HH:MM:00 pour la comparaison
-  if (timeStr.length() == 5) timeStr += ":00";
+  if (index < 0 || index >= MAX_MEALS)
+    return;
+  
+  if (timeStr.length() == 5)
+    timeStr += ":00";  // On s'assure que le format est HH:MM:00 pour la comparaison
   mealTimes[index] = timeStr;
 }
 
 void DistributionManager::CheckAutoFeed(String currentTime, Motor* motor, int coeff) {
-  // Extraction de la minute actuelle pour le flag anti-répétition
-  int currentMinute = currentTime.substring(3, 5).toInt();
+  
+  int currentMinute = currentTime.substring(3, 5).toInt();  // Extraction de la minute actuelle pour le flag lastFedMinute
 
-  // Si on a déjà nourri cette minute, on ne fait rien
-  if (currentMinute == lastFedMinute) return;
+  if (currentMinute == lastFedMinute) return; // Si on a déjà nourri cette minute, on ne fait rien
 
-  // Vérification de tous les horaires
-  bool feedNow = false;
+  bool feedNow = false; // Vérification de tous les horaires
   for (int i = 0; i < mealCount; i++) {
     if (currentTime == mealTimes[i]) {
       feedNow = true;
@@ -83,7 +84,7 @@ void DistributionManager::CheckAutoFeed(String currentTime, Motor* motor, int co
   }
 }
 
-void DistributionManager::ForceFeed(Motor* motor, int coeff) {
+void DistributionManager::ForceFeed(Motor* motor, int coeff) {  // Distribution manuelle
   Serial.println("Distribution Manuelle !");
   motor->Start(1.0*coeff); 
 }

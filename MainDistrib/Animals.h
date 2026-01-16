@@ -26,7 +26,7 @@ class Animals {
 
   public:
     Animals();
-    Animals(String _name, Species* _speciesType, int _age, int _height, int _weight, String _color, String _behavior);
+    Animals(String _name, Species* _speciesType, int _age, int _height, int _weight, String _behavior);
     ~Animals();
 
     // Gestion de la sauvegarde

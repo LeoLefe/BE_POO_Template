@@ -12,10 +12,10 @@
 
 class DistributionManager {
   private:
-    static const int MAX_MEALS = 5; // Maximum 10 repas par jour
-    String mealTimes[MAX_MEALS];    // Tableau des heures "HH:MM:00"
+    static const int MAX_MEALS = 5; // Maximum 3 repas par jour
+    String mealTimes[MAX_MEALS];    // Tableau des heures de repas "HH:MM:00"
     int mealCount;                  // Nombre de repas actifs (1 à 5)
-    int lastFedMinute = -1;         // Flag pour éviter répétition
+    int lastFedMinute = -1;         // Flag pour éviter de redistribuer des croquettes trop rapidement
 
   public:
     DistributionManager();
@@ -28,9 +28,9 @@ class DistributionManager {
     void setMealCount(int n);
     
     String getMealTime(int index);
-    void setMealTime(int index, String timeStr); // format "HH:MM"
+    void setMealTime(int index, String timeStr);
 
-    void CheckAutoFeed(String currentTime, Motor* motor, int coeff); // Passe le moteur en paramètre
+    void CheckAutoFeed(String currentTime, Motor* motor, int coeff);
     void ForceFeed(Motor* motor, int coeff);
 };
 

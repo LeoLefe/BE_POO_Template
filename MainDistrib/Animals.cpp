@@ -1,13 +1,13 @@
-#include "Species.h"
 /*********************************************************************
  * @file  Animals.cpp
  * @author <Léo Lefebvre & Estelle Coudon>
  * @brief Fichier de déclaration de la classe Animals
  *********************************************************************/
 #include "Animals.h"
+#include "Species.h"
 
 Animals::Animals() {}
-Animals::Animals(String _name, Species* _speciesType, int _age, int _height, int _weight, String _color, String _behavior) {
+Animals::Animals(String _name, Species* _speciesType, int _age, int _height, int _weight, String _behavior) {
   this->name = _name;
   this->speciesType = _speciesType;
   this->age = _age;
@@ -28,9 +28,9 @@ void Animals::Load() {
   this->age = prefs.getInt("age", 3);
   this->weight = prefs.getInt("weight", 7);
   this->height = prefs.getInt("height", 20);
-  this->behavior = prefs.getString("behav", "Calme");  
+  this->behavior = prefs.getString("behav", "Calme");
 
-  // On récupère le nom de l'espèce sauvegardé (ex: "Chat", "Chien")
+  // On récupère le nom de l'espèce sauvegardé
   String savedSpeciesName = prefs.getString("species", "Chien");
 
   // On recrée l'objet correspondant au nom
@@ -49,7 +49,7 @@ void Animals::Load() {
   else if (savedSpeciesName == "Souris") {
       this->speciesType = new Mouse();
   }
-  
+
   prefs.end(); // Ferme l'accès
   Serial.println("Données animal chargées depuis la mémoire !");
 }
@@ -86,7 +86,6 @@ String Animals::getName() {
 void Animals::setSpecies(Species* s){
   this->speciesType =s;
 }
-
 Species* Animals::getSpecies(){
   return this->speciesType;
 }
@@ -98,14 +97,12 @@ int Animals::getAge() {
   return this->age;
 }
 
-
 void Animals::setHeight(int h) {
   this->height = h;
 }
 int Animals::getHeight() {
   return this->height;
 }
-
 
 void Animals::setWeight(int w) {
   this->weight = w;

@@ -9,28 +9,26 @@ NetworkApp::NetworkApp() : connected(false) {}
 NetworkApp::~NetworkApp() {}
 
 void NetworkApp::Init() {
-  // Connexion
   WiFi.mode(WIFI_STA);
   WiFi.setSleep(false); // Désactivation du mode économie d'énergie
-  WiFi.begin(ssid, password);
+  WiFi.begin(ssid, password); // Début de la connexion
   Serial.print("Connexion WiFi");
   
   int attempts = 0;
-  while (WiFi.status() != WL_CONNECTED && attempts < 100) {
+  while (WiFi.status() != WL_CONNECTED && attempts < 100) { // Attente de la connexion
     delay(500);
     Serial.print(".");
     attempts++;
   }
 
   if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("\nConnecté ! IP: " + WiFi.localIP().toString());
+    Serial.println("\nConnecté ! IP: " + WiFi.localIP().toString());  // Connexion établie
     
-    // Config heure
-    configTzTime("CET-1CEST,M3.5.0/2,M10.5.0/3", "pool.ntp.org", "time.nist.gov");
+    configTzTime("CET-1CEST,M3.5.0/2,M10.5.0/3", "pool.ntp.org", "time.nist.gov");  // Configuration de l'heure
     connected = true;
   }
   else {
-    Serial.println("\nEchec WiFi (Mode hors ligne)");
+    Serial.println("\nEchec WiFi (Mode hors ligne)"); // Connexion non établie
     connected = false;
   }
 }

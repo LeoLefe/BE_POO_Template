@@ -11,15 +11,15 @@
 enum ExceptionType
 {
   Unknown = 0,
-  InvalidFormat = 1,
-  InvalidHour = 2,
+  InvalidFormat = 1,  // Format de donnée invalide
+  InvalidHour = 2,    // Heure impossible
   InvalidNumberMeals = 3
 };
 
 class DistribException {
   public:
-    int exType;
-    String exMessage;
+    int exType;       // Type d'exception
+    String exMessage; // Message de l'exception
 
     DistribException(int exceptionType, String exceptionMessage);
     ~DistribException();

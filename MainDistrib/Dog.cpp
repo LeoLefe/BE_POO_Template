@@ -12,5 +12,4 @@ Dog::Dog() {
   lifespan = 11;
   rationCoefficient = 3;
 }
-
 Dog::~Dog() {}

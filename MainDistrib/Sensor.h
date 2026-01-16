@@ -15,16 +15,16 @@ class Sensor {
     bool isReady;
     
     // Calibration de la cuve (en mm)
-    const uint16_t DIST_FULL = 35;   // Distance quand plein
-    const uint16_t DIST_EMPTY = 160; // Distance quand vide
+    const uint16_t DIST_FULL = 35;   // Distance quand la cuve est pleine
+    const uint16_t DIST_EMPTY = 160; // Distance quand la cuve est vide
 
   public:
     Sensor();
     ~Sensor();
 
     void Init();
-    uint16_t ReadDistanceMM();
-    uint8_t GetLevelPercent();
+    uint16_t ReadDistanceMM();  // Permet de lire le niveau de croquette manquant
+    uint8_t GetLevelPercent();  // Traduis le niveau de croquette restant sous forme de pourcentage
 };
 
 #endif

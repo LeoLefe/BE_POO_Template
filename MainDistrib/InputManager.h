@@ -8,7 +8,7 @@
 
 #include <Arduino.h>
 
-// Enumération des actions possibles
+// Evenements possibles après avoir appuyé sur les boutons
 enum InputEvent {
   EVT_NONE,
   EVT_BACK,   // BP1
@@ -25,13 +25,14 @@ class InputManager {
     const int PIN_BP4 = 26;
     bool lastStateManual;
     unsigned long lastDebounceTime;
-    const unsigned long DEBOUNCE_DELAY = 300;
+    const unsigned long DEBOUNCE_DELAY = 300; // Délai anti-rebond
 
   public:
     InputManager();
-    void Init();
-    // Retourne l'événement qui vient de se produire (ou EVT_NONE)
-    InputEvent ReadEvent();
+    ~InputManager();
+    
+    void Init();  // Configuration matérielle des boutons
+    InputEvent ReadEvent(); // Retourne l'événement qui vient de se produire
 };
 
 #endif

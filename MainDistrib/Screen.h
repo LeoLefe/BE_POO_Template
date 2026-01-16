@@ -18,31 +18,31 @@ class Screen {
 
     // Configuration de l'arc de cercle
     const int ARC_RADIUS_OUTER = 118; // Rayon extérieur
-    const int ARC_RADIUS_INNER = 110;
-    const int ARC_START_ANGLE = 120;
-    const int ARC_END_ANGLE = 240;
-    const int ARC_FULL_SPAN = 120;   //angle de l'arc
+    const int ARC_RADIUS_INNER = 110; // Rayon intérieur
+    const int ARC_START_ANGLE = 120;  // Angle initial
+    const int ARC_END_ANGLE = 240;    // Angle final
+    const int ARC_FULL_SPAN = 120;    // Angle de l'arc
 
   public:
     public:
     Screen();
     ~Screen();
-    void Init();
-    void Refresh();
+    void Init();    // Ecran de démarrage
+    void Refresh(); // Ecran noir
 
-    void DrawDashboard(String timeStr, int levelPercent, String petName);
-    void DrawMenu(String title, const char* items[], int itemCount, int selectedIndex, int scrollOffset);
-    void DrawKeyboard(String title, String currentText, int selectedKey, bool isNumeric);
+    void DrawDashboard(String timeStr, int levelPercent, String petName); // Permet d'afficher l'écran d'accueil (heure, niveau de croquette et prénom de l'animal)
+    void DrawMenu(String title, const char* items[], int itemCount, int selectedIndex, int scrollOffset); // Permet d'afficher un Menu avec plusieurs items et un scroll si nécessaire
+    void DrawKeyboard(String title, String currentText, int selectedKey, bool isNumeric); // Permet d'afficher un clavier numérique si isNumeric est vraie ou alphanumérique sinon
     
-    // Helpers pour récupérer le caractère d'une touche
-    char GetKeyChar(int index, bool isNumeric);
-    int GetKeyCount(bool isNumeric); // Nombre total de touches
+    // Récupération des caractères du clavier
+    char GetKeyChar(int index, bool isNumeric); // Index de la touche dans le clavier
+    int GetKeyCount(bool isNumeric);            // Nombre total de touches du clavier
 
-    uint16_t GetColorForLevel(int level);
-    void ShowMessage(String msg);
+    uint16_t GetColorForLevel(int level);   // Adaptation de la couleur en fonction du niveau de croquette
+    void ShowMessage(String msg);           // Affiche un message orange d'erreur ou d'information sur un écran noir
     
-    void DrawAnimalSummary(String name, String speciesName, int age, int weight, int height, String behavior);
-    void DrawHourSummary(String H1, String H2, String H3);
+    void DrawAnimalSummary(String name, String speciesName, int age, int weight, int height, String behavior);  // Permet d'afficher la fiche d'information de l'animal
+    void DrawHourSummary(String H1, String H2, String H3);  // Permet d'afficher la fiche listant les heures de repas
 };
 
 #endif
