@@ -6,12 +6,10 @@
 #include "DistributionManager.h"
 
 DistributionManager::DistributionManager() {
-  // Initialisation par défaut pour éviter les valeurs vides
-  for(int i=0; i<MAX_MEALS; i++) mealTimes[i] = "12:00:00"; 
-  
   // Valeurs par défaut classiques
   mealTimes[0] = "08:00:00";
-  mealTimes[1] = "19:00:00";
+  mealTimes[1] = "13:30:00";
+  mealTimes[2] = "19:00:00";
 }
 
 DistributionManager::~DistributionManager() {}
@@ -19,10 +17,6 @@ DistributionManager::~DistributionManager() {}
 void DistributionManager::Init() {
   Preferences prefs;
   prefs.begin("distrib_cfg", true); // Lecture seule
-
-  mealCount = prefs.getInt("count", 2);
-  if (mealCount < 1) mealCount = 1;
-  if (mealCount > MAX_MEALS) mealCount = MAX_MEALS;
 
   for (int i = 0; i < MAX_MEALS; i++) {
     String key = "time_" + String(i);
@@ -36,8 +30,6 @@ void DistributionManager::Init() {
 void DistributionManager::Save() {
   Preferences prefs;
   prefs.begin("distrib_cfg", false); // Ecriture
-
-  prefs.putInt("count", mealCount);
   
   for (int i = 0; i < MAX_MEALS; i++) {
     String key = "time_" + String(i);
@@ -70,7 +62,7 @@ void DistributionManager::CheckAutoFeed(String currentTime, Motor* motor, int co
   if (currentMinute == lastFedMinute) return; // Si on a déjà nourri cette minute, on ne fait rien
 
   bool feedNow = false; // Vérification de tous les horaires
-  for (int i = 0; i < mealCount; i++) {
+  for (int i = 0; i < MAX_MEALS; i++) {
     if (currentTime == mealTimes[i]) {
       feedNow = true;
       break;

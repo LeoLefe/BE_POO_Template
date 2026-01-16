@@ -4,16 +4,7 @@
  * @brief Fichier de déclaration de la classe Screen
  *********************************************************************/
 #include "Screen.h"
-// --- Définition des layouts de claviers ---
 
-// Clavier Alpha : A-Z (26) + EFFACER (index 26) + OK (index 27) -> 28 touches
-const char KEYMAP_ALPHA[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ<>"; 
-// '<' sera représenté par une flèche arrière, '>' par OK
-
-// Clavier Num : 0-9 (10) + EFFACER (10) + OK (11) -> 12 touches
-const char KEYMAP_NUM[] = "0123456789<>";
-
-// Classe screen :
 Screen::Screen() {}
 Screen::~Screen() {}
 

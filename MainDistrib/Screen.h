@@ -23,6 +23,14 @@ class Screen {
     const int ARC_END_ANGLE = 240;    // Angle final
     const int ARC_FULL_SPAN = 120;    // Angle de l'arc
 
+    // Clavier Alphanumérique : A-Z (26) + EFFACER (index 26) + OK (index 27) => 28 touches
+    // '<' sera représenté par un retour en arrière, '>' par OK
+    const char KEYMAP_ALPHA[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ<>"; 
+
+    // Clavier Num : 0-9 (10) + EFFACER (10) + OK (11) => 12 touches
+    // '<' sera représenté par un retour en arrière, '>' par OK
+    const char KEYMAP_NUM[] = "0123456789<>";
+
   public:
     public:
     Screen();

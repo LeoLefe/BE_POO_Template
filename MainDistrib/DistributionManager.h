@@ -12,9 +12,8 @@
 
 class DistributionManager {
   private:
-    static const int MAX_MEALS = 5; // Maximum 3 repas par jour
+    static const int MAX_MEALS = 3; // Maximum 3 repas par jour
     String mealTimes[MAX_MEALS];    // Tableau des heures de repas "HH:MM:00"
-    int mealCount;                  // Nombre de repas actifs (1 à 5)
     int lastFedMinute = -1;         // Flag pour éviter de redistribuer des croquettes trop rapidement
 
   public:
