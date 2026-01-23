@@ -61,7 +61,7 @@ Bouton 4 (Entrée) : Valider / Entrer dans un sous-menu.
 
 ## Menus
 Horaires : Définir les heures de repas (Format HH:MM).  
-Animal : Configurer le profil (Nom, Espèce, Poids, Taill, Comportement).  
+Animal : Configurer le profil (Nom, Espèce, Poids, Taille, Comportement).  
 Distrib Manuel : Forcer une distribution immédiate (sécurisée par le capteur de niveau).
 
 
